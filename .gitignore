@@ -1,0 +1,55 @@
+# Python environments and generated files
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# Tests, coverage, and tooling caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+.ipynb_checkpoints/
+
+# Local IDE and macOS settings
+.idea/
+.vscode/
+.DS_Store
+._*
+
+# Secrets and machine-specific environment settings
+.env
+.env.*
+!.env.example
+
+# Personal sessions: public templates belong in configs/examples/
+configs/my_*.yaml
+configs/my_*.yml
+configs/local/
+
+# Generated experiment outputs, recordings, and trained weights
+artifacts/
+recordings/
+checkpoints/
+runs/
+logs/
+*.log
+*.pt
+*.pth
+*.ckpt
+
+# Native audio helper build/cache output
+.native-helper/
+
+# Local Logic projects and backups
+*.logicx/
+*.logic/
+*.bak
