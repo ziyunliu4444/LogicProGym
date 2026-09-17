@@ -1,0 +1,19 @@
+# Map channel 1 CC20 from your output bus to the agent's Cutoff in Logic.
+# Use a fixed agent channel strip, Unsigned / Scaled / 0..127; Learn Mode OFF.
+adapter:
+  type: logic_midi
+  routes:
+    - {track_id: agent, output_port: "YOUR_AGENT_OUTPUT", channel: 0}
+environment:
+  reset_controls:
+    enabled: true
+    controls:
+      - {action: agent/cutoff, ownership: agent, value: [0.5]}
+tracks:
+  - alias: agent
+    actions:
+      - id: cutoff
+        target: midi.cc.20
+        representation: continuous
+        range: [0, 1]
+        shape: [1]

@@ -1,0 +1,30 @@
+# Worked example: keyboard ratings on Track 1; agent instrument on Track 2.
+# Route the chosen IAC bus to Track 2 in Logic. No Mackie device is needed.
+# Copy to configs/my_human_feedback.yaml and replace YOUR_... device names.
+# Route channel 0 below means MIDI channel 1 (feedback uses 1..16 instead).
+adapter:
+  type: logic_midi
+  routes:
+    - {track_id: agent, output_port: "YOUR_AGENT_OUTPUT", channel: 0}
+tracks:
+  - alias: agent
+    actions:
+      preset: notes_only
+
+# Feedback is read separately and is never forwarded by this program.
+# Keep the human keyboard's Logic track muted during this rating-only test.
+feedback:
+  input_port: "YOUR_KEYBOARD_INPUT"
+  channel: 1                  # Matches your keyboard; human-facing numbering 1..16
+  positive_note: 60           # Numeric MIDI note; octave labels differ by DAW
+  negative_note: 62
+  positive_reward: 1.0
+  negative_reward: -1.0
+  window_seconds: 5.0
+  note_seconds: 0.35
+  gap_seconds: 0.10
+  phrases:
+    - [48, 52, 55, 60]
+    - [60, 55, 52, 48]
+    - [48, 55, 50, 57]
+    - [55, 53, 52, 48]

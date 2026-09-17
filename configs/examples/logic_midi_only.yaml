@@ -1,0 +1,14 @@
+# MIDI only: no Mackie ports are opened. Edit the bus to match Logic.
+adapter:
+  type: logic_midi
+  routes:
+    - {track_id: instrument, output_port: "YOUR_AGENT_OUTPUT", channel: 0}
+tracks:
+  - alias: instrument
+    actions:
+      preset: notes_only
+      add:
+        - id: bend
+          target: midi.pitch_bend
+          representation: continuous
+          range: [-1, 1]

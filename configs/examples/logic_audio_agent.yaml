@@ -1,0 +1,20 @@
+# You play notes in Logic; the agent hears the mix and controls one learned knob.
+# First map CC20 from YOUR_AGENT_OUTPUT, channel 1, to the intended Cutoff knob.
+# Logic Controller Assignment: Format Unsigned, Mode Scaled, incoming range 0..127.
+adapter:
+  type: logic_midi
+  routes:
+    - {track_id: synth, output_port: "YOUR_AGENT_OUTPUT", channel: 0}
+environment:
+  audio:
+    source: native
+    bundle_id: auto
+    window_frames: 4800
+tracks:
+  - alias: synth
+    actions:
+      - id: cutoff
+        target: midi.cc.20
+        representation: continuous
+        range: [0, 1]
+        shape: [1]

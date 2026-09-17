@@ -1,0 +1,63 @@
+# Minimal Gymnasium experiment for addressed Logic instrument parameters.
+adapter:
+  type: logic_mackie
+  controller_count: 2
+  inter_message_delay: 0.1
+  relative_deadzone: 0.1
+  max_steps_per_action: 8
+  controllers:
+    - controller: 1
+      id: track_1
+      track: 1
+      parameters:
+        - id: track_1/page_1/slot_1
+          name: Robotc
+        - id: track_1/page_1/slot_2
+          name: Cutoff
+        - id: track_1/page_1/slot_6
+          name: Res
+    - controller: 2
+      id: track_2
+      track: 2
+      parameters:
+        - id: track_2/page_1/slot_1
+          name: DrvDrv
+        - id: track_2/page_1/slot_6
+          name: Treble
+        - id: track_2/page_1/slot_7
+          name: Bass
+
+environment:
+  event_capacity: 32
+  max_tracks: 8
+  max_parameters: 64
+
+tracks:
+  - alias: track_1
+    observe: [plugin_parameters]
+    actions:
+      add:
+        - id: parameter_vector
+          target: plugin.relative_vector
+          representation: continuous
+          shape: [3]
+          range: [-1.0, 1.0]
+          encoding:
+            parameters:
+              - {id: track_1/page_1/slot_1, page: 1, slot: 1}
+              - {id: track_1/page_1/slot_2, page: 1, slot: 2}
+              - {id: track_1/page_1/slot_6, page: 1, slot: 6}
+  - alias: track_2
+    observe: [plugin_parameters]
+    actions:
+      add:
+        - id: parameter_vector
+          target: plugin.relative_vector
+          representation: continuous
+          shape: [3]
+          range: [-1.0, 1.0]
+          encoding:
+            parameters:
+              - {id: track_2/page_1/slot_1, page: 1, slot: 1}
+              - {id: track_2/page_1/slot_6, page: 1, slot: 6}
+              - {id: track_2/page_1/slot_7, page: 1, slot: 7}

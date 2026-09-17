@@ -1,0 +1,55 @@
+# Human Track 1; synth parameters on Track 2; MIDI trombone on Track 3.
+# Track 2: Alchemy / 8-Bit Memories, Cutoff on page 1, slot 2; verify locally.
+# Use distinct IAC outputs routed exclusively to Tracks 2 and 3.
+# MIDI channel 0 below means wire channel 1. Mackie 1 is unused.
+adapter:
+  type: logic_hybrid
+  midi:
+    sample_rate: 44100
+    routes:
+      - {track_id: human, name: Human, input_port: "YOUR_KEYBOARD_INPUT", input_source: human}
+      - {track_id: synth, name: Synth Track 2, output_port: "YOUR_AGENT_OUTPUT", channel: 0}
+      - {track_id: trombone, name: Trombone Track 3, output_port: "YOUR_SECOND_AGENT_OUTPUT", channel: 0}
+  mackie:
+    controller_count: 2
+    inter_message_delay: 0.01
+    relative_deadzone: 0.1
+    max_steps_per_action: 4
+    controllers:
+      - controller: 2
+        id: synth
+        track: 2
+        parameters:
+          - {id: synth/page_1/slot_2, name: Cutoff}
+environment:
+  event_capacity: 128
+  max_tracks: 8
+  max_parameters: 128
+tracks:
+  - alias: human
+    observe: [notes, velocity, controls]
+  - alias: synth
+    observe: [plugin_parameters]
+    actions:
+      preset: notes_only
+      add:
+        - id: parameter_vector
+          target: plugin.relative_vector
+          representation: continuous
+          shape: [1]
+          range: [-1, 1]
+          encoding:
+            parameters:
+              - {id: synth/page_1/slot_2, page: 1, slot: 2}
+  - alias: trombone
+    actions:
+      preset: notes_only
+      add:
+        - id: pitch_bend
+          target: midi.pitch_bend
+          representation: continuous
+          shape: [1]
+          range: [-1, 1]
+          encoding:
+            protocol: midi1
+            integer_range: [-8192, 8191]

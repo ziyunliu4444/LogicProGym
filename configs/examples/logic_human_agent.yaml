@@ -1,0 +1,65 @@
+# LogicProGym example: a human plays one Logic track while an agent plays and
+# controls an instrument on another track.
+#
+# Copy this file for a new experiment, then edit the values marked EDIT.
+
+adapter:
+  type: logic_hybrid
+
+  # Ordinary MIDI carries the musician's notes into Gymnasium and the agent's
+  # notes back to Logic.
+  midi:
+    sample_rate: 44100
+    routes:
+      - track_id: human
+        name: Human instrument
+        input_port: "YOUR_KEYBOARD_INPUT"  # EDIT: physical keyboard port
+        input_source: human
+
+      - track_id: agent
+        name: Agent instrument
+        output_port: "YOUR_AGENT_OUTPUT"  # EDIT: IAC bus routed to the agent track
+        channel: 0
+
+  # Mackie Control exposes Logic instrument parameters and their displayed
+  # values. One dedicated Mackie controller is recommended per agent track.
+  mackie:
+    controller_count: 2  # EDIT: number of LogicProGym Mackie devices in Logic
+    inter_message_delay: 0.01
+    relative_deadzone: 0.1
+    max_steps_per_action: 4
+    controllers:
+      - controller: 2  # EDIT: Mackie device assigned to this agent track
+        id: agent
+        track: 2       # EDIT: one-based Logic track number
+        parameters:
+          # Parameter addresses come from the Mackie Instrument page and slot.
+          # Replace these after scanning the chosen instrument.
+          - {id: agent/page_1/slot_1, name: Robotc}
+          - {id: agent/page_1/slot_2, name: Cutoff}
+
+environment:
+  event_capacity: 128
+  max_tracks: 8
+  max_parameters: 128
+
+tracks:
+  - alias: human
+    observe: [notes, velocity, controls]
+
+  - alias: agent
+    observe: [plugin_parameters]
+    actions:
+      # Built-in note, velocity, pitch-bend, expression, and sustain actions.
+      preset: expressive_instrument
+      add:
+        # A continuous vector is converted to relative Mackie V-Pot movement.
+        - id: parameter_vector
+          target: plugin.relative_vector
+          representation: continuous
+          shape: [2]
+          range: [-1.0, 1.0]
+          encoding:
+            parameters:
+              - {id: agent/page_1/slot_1, page: 1, slot: 1}
+              - {id: agent/page_1/slot_2, page: 1, slot: 2}

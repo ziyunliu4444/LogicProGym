@@ -1,0 +1,22 @@
+# Mackie only: no MIDI note output. Verify this parameter for your instrument.
+adapter:
+  type: logic_mackie
+  controller_count: 2
+  controllers:
+    - controller: 2
+      id: synth
+      track: 2
+      parameters:
+        - {id: synth/cutoff, name: Cutoff}
+tracks:
+  - alias: synth
+    observe: [plugin_parameters]
+    actions:
+      - id: knobs
+        target: plugin.relative_vector
+        representation: continuous
+        shape: [1]
+        range: [-1, 1]
+        encoding:
+          parameters:
+            - {id: synth/cutoff, page: 1, slot: 2}

@@ -1,0 +1,50 @@
+# Test 2: human plays Track 1; agent plays and changes the instrument on Track 2.
+adapter:
+  type: logic_hybrid
+  midi:
+    sample_rate: 44100
+    routes:
+      - track_id: human
+        name: Human Track 1
+        input_port: "Test Keyboard"
+        input_source: human
+      - track_id: agent
+        name: Agent Track 2
+        output_port: "Test Agent Bus"
+        channel: 0
+  mackie:
+    # Reuse the existing numbered port pairs; Controller 2 controls Logic Track 2.
+    controller_count: 2
+    inter_message_delay: 0.01
+    relative_deadzone: 0.1
+    max_steps_per_action: 4
+    controllers:
+      - controller: 2
+        id: agent
+        track: 2
+        parameters:
+          - {id: agent/page_1/slot_1, name: Knob 1}
+          - {id: agent/page_1/slot_2, name: Cutoff}
+
+environment:
+  event_capacity: 128
+  max_tracks: 3
+  max_parameters: 16
+
+tracks:
+  - alias: human
+    observe: [notes, velocity, controls]
+  - alias: agent
+    observe: [plugin_parameters]
+    actions:
+      preset: expressive_instrument
+      add:
+        - id: parameter_vector
+          target: plugin.relative_vector
+          representation: continuous
+          shape: [2]
+          range: [-1.0, 1.0]
+          encoding:
+            parameters:
+              - {id: agent/page_1/slot_1, page: 1, slot: 1}
+              - {id: agent/page_1/slot_2, page: 1, slot: 2}

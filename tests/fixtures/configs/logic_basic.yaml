@@ -1,0 +1,35 @@
+# Logic is the first reference adapter, but this experiment schema is intended
+# to remain usable with other DAW adapters.
+adapter:
+  type: logic
+
+# Gym control frequency is independent from the DAW's audio sample rate.
+environment:
+  control_hz: 50
+  event_capacity: 128
+
+tracks:
+  # Human input is captured inside Logic and exposed as observations.
+  - alias: human
+    match:
+      name: Human
+    observe:
+      - notes
+      - velocity
+      - controls
+
+  # Agent actions are routed back to a separately identified Logic track.
+  - alias: agent
+    match:
+      name: Agent
+    actions:
+      preset: expressive_instrument
+      add:
+        # A user-defined plug-in control can extend a built-in musical preset.
+        - id: brightness
+          target: plugin.parameter
+          representation: continuous
+          range: [0.0, 1.0]
+          smoothing_ms: 20
+          encoding:
+            parameter: filter_cutoff

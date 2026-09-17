@@ -1,0 +1,24 @@
+include LICENSE CHANGELOG.md
+include CONTRIBUTING.md
+include .github/pull_request_template.md
+recursive-include docs *.md
+recursive-include configs/examples *.yaml
+include examples/logic_frame_observer.py
+include live_tests/logic_reset_test.py
+include live_tests/logic_cutoff_reset_test.py
+include live_tests/logic_public_api.py
+include examples/logic_multi_agent.py
+include examples/logic_train_policy.py
+include examples/logic_human_feedback.py
+include tools/logic_midi_learn.py
+include tools/logic_midi_cc_test.py
+include live_tests/logic_audio_test.py
+include examples/logic_audio_agent.py
+recursive-include src/logicprogym/native *.swift *.plist
+# Keep the source archive's regression suite runnable, including compatibility tests.
+recursive-include tests *.py *.yaml
+include tools/release_smoke.py
+include protocol/spec-v1.md
+
+include examples/logic_shared_track.py examples/logic_split_tracks.py
+include examples/README.md tools/README.md live_tests/README.md

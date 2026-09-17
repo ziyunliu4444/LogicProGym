@@ -1,0 +1,18 @@
+# Observation-only: receives your keyboard; sends no MIDI notes or knob actions.
+adapter:
+  type: logic_midi
+  routes:
+    - {track_id: human, input_port: "YOUR_KEYBOARD_INPUT", input_source: human}
+environment:
+  frames:
+    enabled: true
+    duration_seconds: 0.05
+  # Optional: enable after granting native capture permission.
+  # audio:
+  #   source: native
+  #   bundle_id: auto
+  #   sample_rate: 48000  # Must match the actual audio rate.
+  #   channels: 2
+tracks:
+  - alias: human
+    observe: [notes, velocity, controls]
