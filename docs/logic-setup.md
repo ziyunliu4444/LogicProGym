@@ -11,14 +11,21 @@ For agent audio observations, see [audio input setup and testing](audio-input.md
 
 ## 1. Install LogicProGym
 
-Open Terminal in the project directory and run these as separate commands:
+With Git and Python 3.10+ installed on macOS, open Terminal in the parent folder
+where you want to keep the project. Clone the repository and install it:
 
 ```bash
-cd /path/to/LogicProGym
+git clone https://github.com/ziyunliu4444/LogicProGym.git
+cd LogicProGym
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install -e .
 ```
+
+Already cloned or downloaded the project? Open its `LogicProGym` folder and skip
+the clone command. If `.venv` already exists, activate it instead of recreating it.
+Run subsequent commands from this project folder with the virtual environment
+active. In a new terminal, return to the folder and activate `.venv` again.
 
 The editable installation only needs to be repeated after recreating the
 virtual environment or changing package configuration. Ordinary Python source

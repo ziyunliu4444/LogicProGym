@@ -24,13 +24,19 @@ demonstrate possible policies and rewards, not a pretrained musical agent.
 
 ## Install
 
-From your local checkout:
+On macOS with Git and Python 3.10+ installed, open Terminal and run:
 
 ```bash
+git clone https://github.com/ziyunliu4444/LogicProGym.git
+cd LogicProGym
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install -e .
 ```
+
+If you already have a checkout, open its folder and start at the virtual-environment
+step. Run the remaining commands in this README from the `LogicProGym` folder.
+In a new terminal, return to that folder and run `source .venv/bin/activate` again.
 
 One installation includes all feature dependencies, including training. Choose
 features in YAML; no feature extras are required. Native audio capture requires
