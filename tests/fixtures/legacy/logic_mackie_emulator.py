@@ -1,8 +1,7 @@
-"""Interactively explore a Logic instrument through Mackie Control.
+"""Regression fixture for the Mackie emulator's parsing and control behavior.
 
-Configure this program's two virtual ports on a Mackie Control device in
-Logic.  Select a software-instrument track, type ``instrument``, and Logic's
-two-row Mackie display will be reconstructed in the terminal.
+Retained for automated compatibility tests, not as a public entry point.
+Use ``logicprogym logic inspect`` or ``logicprogym logic scan`` for live setup.
 """
 
 from __future__ import annotations

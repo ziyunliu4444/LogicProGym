@@ -37,7 +37,7 @@ class LogicProAdapter(MusicBackend, ABC):
 
     @abstractmethod
     def receive(self) -> DawSnapshot:
-        """Return the most recent synchronized DAW state."""
+        """Return available events and state; timing and freshness depend on the adapter."""
         ...
 
     @abstractmethod
@@ -51,7 +51,7 @@ class LogicProAdapter(MusicBackend, ABC):
         ...
 
     def discover_world(self) -> MusicWorldDescription:
-        """Translate the legacy DAW discovery pair into a music-world schema."""
+        """Translate track and parameter descriptors into a music-world schema."""
 
         tracks, parameters = self.discover()
         controls = tuple(
@@ -88,6 +88,6 @@ class LogicProAdapter(MusicBackend, ABC):
         self.send(commands)
 
     def reset(self) -> None:
-        """Legacy DAW adapters currently reset through environment note cleanup."""
+        """Default no-op; the environment handles agent-note cleanup separately."""
 
         return None

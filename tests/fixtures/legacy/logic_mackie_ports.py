@@ -1,9 +1,8 @@
-"""Create the two virtual CoreMIDI endpoints for LogicProGym's Logic control surface.
+"""Regression fixture for virtual CoreMIDI endpoint behavior.
 
-Keep this process running while configuring Logic. The Python output endpoint
-appears to Logic as an input, and the Python input endpoint appears to Logic as
-an output. Incoming messages are printed raw. For the interactive Phase 3
-emulator and decoded LCD, use ``logic_mackie_emulator.py``.
+Retained for automated compatibility tests, not as a public setup tool.
+Use ``logicprogym logic inspect`` for interactive inspection; see tools/README.md.
+Python output endpoints appear as Logic inputs, and Python inputs as Logic outputs.
 """
 
 from __future__ import annotations

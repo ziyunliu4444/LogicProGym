@@ -1,4 +1,7 @@
-"""Test 2: human MIDI on Track 1; agent MIDI and Mackie control on Track 2."""
+"""Regression fixture for split-track MIDI and Mackie control.
+
+Not a public example; use examples/logic_split_tracks.py and its walkthrough.
+"""
 
 from __future__ import annotations
 

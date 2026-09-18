@@ -1,8 +1,9 @@
-"""Train a synth agent whose cutoff follows a human pianist's pitch.
+"""Regression fixture for pitch-conditioned cutoff learning.
 
-Track 1 is the human piano. Track 2 receives agent notes through IAC Driver Bus
-1 and parameter control through Mackie Controller 2. The agent mirrors the
-highest held piano note one octave lower and learns relative Cutoff movement.
+Retained for automated compatibility tests, not as a public learning example.
+See examples/README.md for supported demonstrations and setup walkthroughs.
+The fixture mirrors the highest held note one octave lower and learns relative
+Cutoff movement on a separate agent track.
 """
 
 from __future__ import annotations

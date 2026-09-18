@@ -1,8 +1,9 @@
-"""Logic Pro adapter boundaries and an initial routed-MIDI implementation.
+"""Routed MIDI input and output for Logic Pro.
 
-The MIDI prototype uses distinct Logic/IAC routes per exposed track. It does not
-claim access to Logic transport, mixer state, or arbitrary plug-in parameters;
-those require a later control-surface or DAW-side bridge.
+The MIDI adapter uses configured ports and channels per exposed track. It does
+not read Logic transport, mixer state, or arbitrary plug-in parameters. Mackie
+parameter control and feedback are implemented separately in logic_mackie.py;
+logic_hybrid.py combines the two transports.
 """
 
 from __future__ import annotations
@@ -31,9 +32,11 @@ from logicprogym.models import (
 class LogicMidiRoute:
     """MIDI ports and channel assigned to one Logic track.
 
-    ``input_port`` is MIDI routed *out of Logic* for observation. ``output_port``
-    is MIDI sent *into Logic* for agent control. Keeping them separate preserves
-    event provenance and avoids treating agent output as human input.
+    ``input_port`` receives observations from a configured MIDI source, such as
+    a physical keyboard or virtual bus; it need not originate in Logic.
+    ``output_port`` sends agent messages to a destination routed into Logic.
+    ``input_source`` labels incoming events; correct routing is still required
+    to prevent agent output from being mistaken for human input.
     """
 
     track_id: str
@@ -51,16 +54,16 @@ class LogicMidiRoute:
 
 
 class LogicAdapter(LogicProAdapter):
-    """Future Logic Pro integration implementing :class:`LogicProAdapter`.
+    """Unimplemented placeholder, not the working Logic MIDI adapter.
 
-    Raising explicitly is safer than exposing a partial adapter that silently
-    drops musical events during an experiment.
+    The factory rejects the generic ``logic`` adapter type. Use ``logic_midi``,
+    ``logic_mackie``, or ``logic_hybrid`` for supported connections.
     """
 
     capabilities = AdapterCapabilities()
 
     def connect(self) -> None:
-        """Connect once the Logic bridge transport has been implemented."""
+        """Reject connection through this unimplemented placeholder."""
 
         raise NotImplementedError("Logic Pro communication has not been implemented yet")
 

@@ -93,8 +93,8 @@ def _track_actions(track_id: str, raw: object) -> tuple[ActionSpec, ...]:
 class LogicProGymConfig:
     """Top-level experiment configuration loaded from YAML.
 
-    Dictionaries are retained at this early stage because the adapter and track
-    schemas are still evolving. They can become typed nested models later.
+    Adapter and environment mappings retain transport-specific settings.
+    Track entries compile into observation selections and typed action specs.
     """
 
     adapter: dict[str, Any]

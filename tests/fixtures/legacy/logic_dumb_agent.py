@@ -1,9 +1,8 @@
-"""Minimal deterministic agent for testing Logic MIDI input and output.
+"""Regression fixture for deterministic MIDI agent behavior.
 
-The agent is intentionally non-learning: a bass track plays a repeating bass
-line while a lead track cycles through a C-major pattern. At the same time it
-prints human events received from the configured MIDI keyboard. Press Ctrl-C to
-stop; the environment sends MIDI all-notes-off before closing its ports.
+Retained for automated compatibility tests, not as a public example.
+See examples/README.md for runnable demonstrations. This fixture uses a
+repeating bass line and C-major lead pattern alongside human MIDI input.
 """
 
 from __future__ import annotations
