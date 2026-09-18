@@ -82,46 +82,19 @@ With Logic open and the control surfaces assigned, verify live Mackie feedback:
 logicprogym doctor configs/my_session.yaml --live
 ```
 
-A message such as:
-
-```text
-[FAIL] agent parameters: not shown on the current Instrument page: parameter 1
-```
-
-usually means the copied example still contains a placeholder name. If Logic
-shows `Robotc` in page 1, slot 1, change:
-
-```yaml
-- {id: agent/page_1/slot_1, name: Parameter 1}
-```
-
-to:
-
-```yaml
-- {id: agent/page_1/slot_1, name: Robotc}
-```
-
-The configured name must match Logic's Mackie display at the configured page
-and slot. The live doctor checks that address at verification time; it does
-not prevent later instrument or preset changes during training.
+The live check verifies configured names at their page/slot addresses. A failure
+can mean a changed preset, incorrect routing, or unavailable display feedback;
+do not rename parameters merely to suppress an error. Use the
+[Mackie troubleshooting guide](mackie-discovery.md#understand-the-display-and-troubleshoot)
+to distinguish these cases. A successful check does not prevent later preset changes.
 
 ## 5. Scan instrument parameters
 
-For interactive browsing, name-free setup, all-page discovery, and catalog
-references in YAML, see [Mackie discovery](mackie-discovery.md).
-
-Scan the first two Mackie Instrument pages and save their page/slot/name map:
-
-```bash
-logicprogym logic scan configs/my_session.yaml \
-  --track agent \
-  --pages 2 \
-  --output configs/my_instrument.yaml
-```
-
-Use the resulting catalog to replace placeholder parameter entries and update
-the `encoding.parameters` addresses in `configs/my_session.yaml`. Run the live
-doctor again after making changes.
+Use the [setup tools catalogue](../tools/README.md) to choose between interactive
+inspection and scanning. The [discovery guide](mackie-discovery.md) covers starting
+without known names, browsing pages, and referencing selected catalog entries
+directly in YAML. Inline parameter names remain an alternative. Run the live
+doctor again after changing mappings.
 
 ## 6. Create a Gymnasium environment
 

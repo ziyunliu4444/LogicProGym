@@ -6,6 +6,10 @@ Gymnasium `reset()`, `step()`, action spaces and wrappers.
 
 **1.0.0 · MIT · macOS + Logic Pro**
 
+**Find your next step:** [Setup tools](tools/README.md) ·
+[Musical examples](examples/README.md) · [Write YAML](docs/yaml-configuration.md) ·
+[Documentation and troubleshooting](docs/README.md)
+
 ## What it supports
 
 - MIDI notes, velocity, pitch bend and user-defined MIDI CC controls.
@@ -88,18 +92,9 @@ Alchemy macro mappings are specific to the documented preset.
 Replace `YOUR_KEYBOARD_INPUT`, `YOUR_AGENT_OUTPUT` and, where used,
 `YOUR_SECOND_AGENT_OUTPUT` with your own names before running.
 
-| Use case | Start here |
-| --- | --- |
-| Frame-wise observation without agent actions | [Frame observation guide](docs/frame-observations.md) |
-| Human notes with agent-controlled timbre | [Shared-instrument walkthrough](docs/walkthrough-shared-instrument.md) |
-| Human and agent on separate instruments | [Split-instrument walkthrough](docs/walkthrough-split-instruments.md) |
-| MIDI routing smoke check | `logic_midi_only.yaml` + `live_tests/logic_public_api.py` |
-| Plug-in knobs through Mackie | `logic_mackie_only.yaml` + [setup guide](docs/logic-setup.md) |
-| Pitch-imitation training and checkpoint resume | [Training walkthrough](docs/walkthrough-policy-training.md) |
-| Synth MIDI/knobs plus a second MIDI instrument | `logic_two_agents.yaml` + [multi-track guide](docs/two-agents-and-training.md) |
-| Learning from human MIDI ratings | [Human feedback guide](docs/human-midi-feedback.md) |
-| Hearing audio and moving a mapped knob | [Audio example](docs/audio-input.md#example-an-agent-acts-on-raw-audio) |
-| Learning and testing a MIDI knob mapping | [MIDI CC guide](docs/control-modes.md#let-the-agent-control-a-logic-plug-in-knob-using-midi) |
+The [example catalogue](examples/README.md) pairs each musical scenario with its
+script, configuration, and walkthrough: shared or separate instruments, two-agent
+performance, pitch training, human feedback, audio-driven control, and frame observation.
 
 Instrument parameter names and page/slot addresses also depend on your preset.
 Scan and verify them before using Mackie templates. The [control modes guide](docs/control-modes.md)
@@ -160,7 +155,7 @@ state, follow the [reconnection guide](docs/renaming.md).
 | `src/logicprogym/` | Environment interface, control adapters, observations, and audio capture |
 | `configs/examples/` | Public configurations to copy and customize |
 | `examples/` | Musical demonstrations and learning examples |
-| `tools/` | MIDI assignment utilities and maintainer packaging checks |
+| `tools/` | Setup-tool catalogue, MIDI assignment utilities, and maintainer packaging checks |
 | `live_tests/` | Manual checks requiring your Logic setup |
 | `tests/` | Device-free automated tests and their fixtures |
 | `docs/` | Setup, walkthroughs, reference, and contributor guides |

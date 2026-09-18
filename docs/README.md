@@ -1,44 +1,37 @@
 # Documentation
 
-Start with installation, choose a musical example, then consult the reference
-guides as needed. Commands assume a source checkout with the virtual environment
-active. Copy public configurations to `configs/my_*.yaml` and set your device
-names; personal configurations are not bundled.
+You do not need to read every guide. Choose the task below; detailed references
+are for when you need them. Commands assume an installed source checkout and an
+active virtual environment. Personal `configs/my_*.yaml` files are not bundled.
 
-## Getting started
+## Start here
 
-- [Install and configure Logic](logic-setup.md)
-- [Write session YAML: tutorial and field reference](yaml-configuration.md)
-- [Choose MIDI, Mackie, or combined controls](control-modes.md)
-- [Support scope and limitations](release-status.md)
-- [Reconnect virtual control surfaces](renaming.md)
+| Your task | Entry point |
+| --- | --- |
+| Install and connect for the first time | [Logic setup](logic-setup.md) |
+| Find devices, inspect/scan knobs, or learn MIDI assignments | [Setup tools](../tools/README.md) |
+| Run a musical demonstration or learning policy | [Example catalogue and walkthroughs](../examples/README.md) |
+| Define your own tracks, actions, and observations | [YAML tutorial and reference](yaml-configuration.md) |
+| Verify audio, reset, routing, or shutdown on your machine | [Live checks](../live_tests/README.md) |
 
-## Musical walkthroughs
+## Troubleshooting
 
-- [Choose an example](../examples/README.md)
-- [Shared instrument: human notes and agent sound shaping](walkthrough-shared-instrument.md)
-- [Separate human and agent instruments](walkthrough-split-instruments.md)
-- [Two scripted agents alongside a human](two-agents-and-training.md)
-- [Pitch-policy training and resume](walkthrough-policy-training.md)
-- [Learning from human MIDI ratings](human-midi-feedback.md)
-- [Audio-conditioned parameter control](audio-input.md#example-an-agent-acts-on-raw-audio)
-- [Frame-wise observation without agent actions](frame-observations.md)
-
-## Setup checks and troubleshooting
-
-- [Interactive Mackie inspection and automatic discovery](mackie-discovery.md)
-- [MIDI assignment tools](../tools/README.md)
-- [Manual live checks](../live_tests/README.md)
-- [Validate your live setup](logic-1.0-acceptance.md)
-- [Audio capture and permissions](audio-input.md)
-- [Shutdown and cleanup](shutdown.md)
+- Wrong or missing Mackie display: [discovery troubleshooting](mackie-discovery.md#understand-the-display-and-troubleshoot).
+- Stale endpoints or wrong routing: [reconnect control surfaces](renaming.md).
+- MIDI-mapped knob does not move: [assignment guide](control-modes.md#let-the-agent-control-a-logic-plug-in-knob-using-midi).
+- Missing audio or recording permission: [audio guide](audio-input.md).
+- Notes or processes remain after stopping: [shutdown and cleanup](shutdown.md).
 
 ## Experiment reference
 
+- [Supported scope and limitations](release-status.md)
+- [Choose MIDI, Mackie, or combined controls](control-modes.md)
 - [Mackie parameter validity](parameter-observations.md)
+- [Frame-wise MIDI and audio](frame-observations.md)
 - [Opt-in control resets](reset-controls.md)
 - [Timing, freshness, and run manifests](experiment-reproducibility.md)
 - [Checkpoints and resume](checkpoints-and-release.md)
+- [Full live acceptance checklist](logic-1.0-acceptance.md)
 
 ## Contributors and maintainers
 

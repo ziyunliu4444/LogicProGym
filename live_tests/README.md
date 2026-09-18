@@ -3,6 +3,10 @@
 These scripts exercise routing and lifecycle behavior, not learned musical
 behavior. Use a backed-up test project at comfortable monitoring levels.
 
+Need to discover devices, inspect Mackie pages, or create a knob assignment first?
+Start with [setup tools](../tools/README.md). For musical demonstrations, see
+[examples](../examples/README.md).
+
 | Script | Purpose |
 | --- | --- |
 | `logic_public_api.py` | Bounded random controls, diagnostics and cleanup |
