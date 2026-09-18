@@ -1,0 +1,13 @@
+# Discovery needs only the controller and target track, not parameter names.
+# Set these numbers to match your Logic project and control-surface setup.
+adapter:
+  type: logic_mackie
+  controller_count: 2
+  controllers:
+    - controller: 2
+      id: agent
+      track: 2
+      parameters: []
+tracks:
+  - alias: agent
+    observe: [plugin_parameters]

@@ -46,19 +46,22 @@ def is_parameter_view(controller, names: Iterable[str] = ()) -> bool:
         return True
     configured = {name.strip().lower() for name in names if name.strip()}
     displayed = {upper.strip().lower() for upper, _lower in lcd.strips if upper.strip()}
+    # Mixer offsets are numeric too. Their Master/output strips and temporary
+    # Select overlay must not short-circuit entry into Instrument Edit mode.
+    if 'select' in displayed or ('master' in displayed and 'st out' in displayed):
+        return False
     if configured & displayed:
         return True
 
-    # A Mackie value view has parameter names above values but no Track/Page
-    # header. Recognize it independently of the configured page so a scanner
-    # can recover when Logic was left on page 2 or later. Mixer/select views
-    # generally contain instrument names rather than several numeric values.
-    numeric_values = sum(
-        re.search(r"[-+]?\d", lower) is not None
-        for _upper, lower in lcd.strips
-        if lower.strip()
+    # A later Instrument page may have names absent from our configured page.
+    # Multiple fully formatted percentages are a useful fallback; bare numbers
+    # (including nonzero mixer offsets) are not sufficient evidence. Ambiguous
+    # enum/numeric pages need an actual header or a configured name match.
+    percentages = sum(
+        re.fullmatch(r'[+-]?\d+(?:\.\d+)?\s*%', lower.strip()) is not None
+        for upper, lower in lcd.strips if upper.strip()
     )
-    return numeric_values >= 2
+    return percentages >= 2
 
 
 def _wait_until(predicate, timeout: float) -> bool:
@@ -100,9 +103,11 @@ def activate_parameter_view(component, track_id: str, timeout: float = 3.0, *, s
     controller = bridge.pool.acquire(track_id)
     track = bridge.pool.tracks[track_id]
     names = expected_names(component, track_id)
-    ready = (lambda: _scan_header(controller, track.logic_track)) if scan else (
-        lambda: is_parameter_view(controller, names)
-    )
+    def ready():
+        header = instrument_header(controller.lcd)
+        if scan or header is not None:
+            return _scan_header(controller, track.logic_track)
+        return is_parameter_view(controller, names)
     before = controller.lcd.rows
     send_all(controller.output, track_select_messages(track.logic_track - 1))
     _wait_until(lambda: controller.lcd.rows != before, min(0.75, timeout))
@@ -111,6 +116,22 @@ def activate_parameter_view(component, track_id: str, timeout: float = 3.0, *, s
     while time.monotonic() < deadline:
         if _wait_stable_view(controller, ready, 0.20):
             return controller
+        if scan and _wait_stable_view(
+            controller,
+            lambda: instrument_header(controller.lcd) is None and is_parameter_view(controller, names),
+            0.20,
+        ):
+            # Instrument Edit has two LCD layouts. Pressing Instrument again
+            # changes modes; Name/Value is the display toggle we need here.
+            # Toggle once, then require the requested track's real header.
+            send_all(controller.output, button_messages('name_value'))
+            if _wait_stable_view(controller, ready, timeout):
+                return controller
+            raise RuntimeError(
+                f"Logic is showing Instrument values for {track_id!r}, but did not "
+                "return the requested track header after Name/Value. No catalog written. "
+                f"Current display: {controller.lcd.strips!r}"
+            )
         before = controller.lcd.rows
         send_all(controller.output, button_messages("instrument"))
         # Wait for this individual button press to produce feedback before
@@ -149,15 +170,16 @@ def scan_parameters(
     component,
     track_id: str,
     *,
-    pages: int,
+    pages: int | None,
     timeout: float = 3.0,
     start_page: int | None = None,
+    on_page=None,
 ) -> list[dict[str, Any]]:
     """Read parameter names from consecutive Mackie Instrument pages."""
 
     if start_page is not None and start_page < 1:
         raise ValueError('start_page must be positive')
-    if pages < 1:
+    if pages is not None and pages < 1:
         raise ValueError("pages must be positive")
     # Scan activation must not accept mixer numeric values or names left over
     # from another instrument. Reach the requested track's header directly.
@@ -169,13 +191,19 @@ def scan_parameters(
     # names. The value view is useful during control, but partial page updates
     # can otherwise make percentages look like parameter names.
     marker = instrument_page(controller.lcd)
+    if pages is None:
+        if marker is None:
+            raise RuntimeError('Logic did not expose a total page count; use --pages N and, if needed, --start-page N.')
+        pages = marker[1] if start_page is None else marker[1] - marker[0] + 1
+        if not 1 <= pages <= 256:
+            raise ValueError('Automatic discovery is limited to 256 pages; use an explicit --pages count.')
     if marker is not None and start_page is not None and marker[0] != start_page:
         raise RuntimeError(f'Visible page {marker[0]} contradicts --start-page {start_page}')
     if marker is None:
         if start_page is None or start_page < 1:
             raise RuntimeError(
                 "Instrument header recognized, but its page number is truncated. "
-                "Set the desired page in the emulator, then supply --start-page N "
+                "Inspect the current page with 'logicprogym logic inspect', then supply --start-page N "
                 "to explicitly identify the current page. No catalog was written."
             )
         marker = (start_page, start_page + pages - 1)
@@ -211,6 +239,8 @@ def scan_parameters(
             if lower
         ]
         found.append({"page": page, "parameters": parameters})
+        if on_page is not None:
+            on_page(found[-1])
         if page == first_page + pages - 1:
             break
         before_names = controller.lcd.rows[1]

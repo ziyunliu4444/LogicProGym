@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Mapping, Sequence
 
 import gymnasium as gym
 import numpy as np
@@ -13,6 +13,7 @@ from logicprogym.actions.specs import ActionSpec
 from logicprogym.backends.base import MusicBackend
 from logicprogym.models import DawSnapshot
 from logicprogym.observations import ObservationBuilder
+from logicprogym.observation_selection import ObservationSelection
 from logicprogym.registry import SessionRegistry
 from logicprogym.spaces import build_action_space, build_observation_space
 from logicprogym.validation import validate_capabilities
@@ -42,6 +43,7 @@ class LogicProEnv(gym.Env):
         max_tracks: int = 16,
         max_parameters: int = 256,
         observed_fields: Sequence[str] = (),
+        track_observations: Mapping[str, Sequence[str]] | None = None,
         reward: RewardFunction | None = None,
         reset_controls: dict | None = None,
     ) -> None:
@@ -58,13 +60,18 @@ class LogicProEnv(gym.Env):
         self.action_processor = ActionProcessor(self.action_specs)
         self.event_capacity = event_capacity
         self.reward_function = reward
-        self.observed_fields = tuple(observed_fields)
+        self.observation_selection = (None if track_observations is None
+                                      else ObservationSelection(track_observations))
+        self.observed_fields = (tuple(observed_fields) if track_observations is None else
+                               tuple(field for fields in track_observations.values() for field in fields))
         # Reject impossible experiments before opening ports or starting a DAW.
         validate_capabilities(
             adapter.capabilities, self.action_specs, self.observed_fields
         )
         self.registry = SessionRegistry(max_tracks, max_parameters)
-        self.observation_builder = ObservationBuilder(self.registry, event_capacity)
+        self.observation_builder = ObservationBuilder(
+            self.registry, event_capacity,
+            note_activity_from_kind=self.observation_selection is not None)
         self.action_space = build_action_space(self.action_specs)
         self.observation_space = build_observation_space(
             event_capacity, max_tracks, max_parameters
@@ -93,6 +100,7 @@ class LogicProEnv(gym.Env):
             max_tracks=int(environment.get("max_tracks", 16)),
             max_parameters=int(environment.get("max_parameters", 256)),
             observed_fields=observed_fields,
+            track_observations={track.alias: track.observe for track in config.tracks},
             reward=reward,
             reset_controls=environment.get("reset_controls"),
         )
@@ -100,7 +108,16 @@ class LogicProEnv(gym.Env):
     def _observation(self, snapshot: DawSnapshot) -> dict[str, np.ndarray]:
         """Convert a canonical snapshot into fixed-shape numerical arrays."""
 
-        return self.observation_builder.build(snapshot)
+        observation = self.observation_builder.build(snapshot)
+        if self.observation_selection is not None:
+            observation = self.observation_selection.mask(observation, self.registry)
+        return observation
+
+    def _select_snapshot(self, snapshot: DawSnapshot) -> DawSnapshot:
+        """Use the same selected state for observations, rewards, and public info."""
+        if self.observation_selection is None:
+            return snapshot
+        return self.observation_selection.snapshot(snapshot, self.registry)
 
     def reset(self, *, seed=None, options=None):
         """Connect lazily and return the latest DAW snapshot."""
@@ -125,7 +142,7 @@ class LogicProEnv(gym.Env):
         if self._reset_commands:
             self.backend.apply(self._reset_commands)
         self.observation_builder.reset()
-        snapshot = self.backend.observe()
+        snapshot = self._select_snapshot(self.backend.observe())
         if self.frame_clock is not None:
             self.frame_clock.reset()
             self.frame_clock.drop_baseline = snapshot.diagnostics.get("midi", snapshot.diagnostics).get("frame_queue_dropped", 0)
@@ -147,7 +164,7 @@ class LogicProEnv(gym.Env):
         commands = self.action_processor.process(action)
         self.backend.apply(commands)
         frame = None if self.frame_clock is None else self.frame_clock.wait()
-        snapshot = self.backend.observe()
+        snapshot = self._select_snapshot(self.backend.observe())
         if frame is not None:
             snapshot = self.frame_clock.snapshot(snapshot, self.observation_builder, frame)
         reward = 0.0 if self.reward_function is None else self.reward_function(snapshot, action)

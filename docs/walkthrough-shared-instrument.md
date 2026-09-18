@@ -67,7 +67,39 @@ logicprogym logic scan configs/my_shared_track.yaml --track shared --pages 1 --o
 Update both parameter names and page/slot addresses if necessary. A catalog
 does not automatically replace your configuration.
 
+For interactive `lcd`, `left`/`right`, knob tests, all-page scanning, or loading
+selected catalog entries without copying names, see the
+[Mackie inspection and discovery guide](mackie-discovery.md#using-an-existing-shared-instrument-session).
+
 ## Play
+
+The normal run automatically prints `KNOB` readings after the agent moves.
+It collects feedback for up to 0.3 seconds before the next action, without extra
+knob movements. Percentages are Logic's reported text, not estimated positions.
+Only parameters for which matched numeric feedback arrives can be shown; Logic
+does not necessarily report all eight values together. Readings describe recent
+reports, not acknowledgements of individual movements.
+
+`displayed=... unverified track/page` is a terminal-only fallback when the LCD
+shows a matching name and number but identity is unconfirmed. Its freshness is
+unknown; it is not promoted into confirmed Gymnasium observations or rewards.
+
+Optional: to inspect feedback without scripted knob movement:
+
+```bash
+python examples/logic_shared_track.py configs/my_shared_track.yaml --read-only --steps 120
+```
+
+Keep `plugin_parameters` in the shared track's `observe` list. Open Alchemy and
+move Cutoff manually. `KNOB` lines show the reported display text, validity, and
+age. `waiting` means no matched numeric reading; `unavailable last_reported`
+is not a confirmed current value. Enumeration labels and fractions such as
+arpeggiator modes/rates are not currently exposed by the numeric feedback parser.
+Logic must send matching track/page/parameter feedback; a mouse movement is not
+guaranteed to produce it. Read-only sends zero parameter movements and no notes,
+but establishing the Mackie connection can select tracks and Instrument views.
+
+To run scripted knob movement with the same readout:
 
 ```bash
 python examples/logic_shared_track.py configs/my_shared_track.yaml --steps 120

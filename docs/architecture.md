@@ -56,7 +56,12 @@ every step. The backend may report asynchronous or incomplete state.
 The factory's reward callback receives `(snapshot, action)`. `FunctionReward`
 is a wrapper for `(observation, action, info)` callbacks. They are distinct
 interfaces; keep task-specific reward logic out of MIDI and audio transport.
-The default reward is zero.
+The default reward is zero. YAML `tracks[].observe` selects signals per track
+before history/frame assembly. The same filtered snapshot feeds rewards and
+`info`; excluded numerical state is masked without changing slot indices.
+See [observation selection](yaml-configuration.md#tracks-and-observations).
+The low-level Python constructor keeps unfiltered compatibility behavior unless
+`track_observations` is supplied.
 
 `close()` attempts agent note cleanup and backend closure. Native calls can
 stall. The training and reset CLI supervisor bounds worker shutdown separately;

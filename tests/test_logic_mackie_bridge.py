@@ -193,6 +193,8 @@ def test_gym_step_routes_discrete_relative_action_to_track_two() -> None:
             0x16,
             0x44,
         )
-        assert "mackie_pages" in info["snapshot"].diagnostics
+        # YAML selections expose addressed readings, not unverified LCD/page caches.
+        assert "parameter_readings" in info["snapshot"].diagnostics
+        assert "mackie_pages" not in info["snapshot"].diagnostics
     finally:
         env.close()

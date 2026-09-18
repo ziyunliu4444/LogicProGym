@@ -63,3 +63,95 @@ def test_catalog_writer_creates_reusable_track_mapping(tmp_path) -> None:
         "slot": 2,
         "name": "Cutoff",
     }
+
+
+def test_mixer_numbers_and_selection_overlay_are_not_instrument_parameters():
+    controller = SimpleNamespace(lcd=MackieLcd())
+    def display(upper, lower):
+        controller.lcd.apply(0, ''.join(cell.ljust(7) for cell in upper))
+        controller.lcd.apply(56, ''.join(cell.ljust(7) for cell in lower))
+    display(['8-BitM', 'StGrPn', 'Trmbns', 'LR/Lar', 'SR/Std', 'LH/Con', 'St Out', 'Master'],
+            ['0', '0', '0', '0', '0', '0', '0', ''])
+    assert not is_parameter_view(controller, {'Robotc', 'Cutoff'})
+    display(['Select', 'StGrPn', 'Trmbns', 'LR/Lar', 'SR/Std', 'LH/Con', 'St Out', 'Master'],
+            ['8-Bit M', 'emories', '', '0', '0', '0', '0', ''])
+    assert not is_parameter_view(controller, {'Robotc', 'Cutoff'})
+    display(['Track A', 'Track B', '', '', '', '', '', ''],
+            ['+1', '-3', '', '', '', '', '', ''])
+    assert not is_parameter_view(controller)
+
+
+def test_activation_sends_instrument_from_numeric_mixer(monkeypatch):
+    from logicprogym import logic_setup
+    from logicprogym.adapters.mackie import button_messages
+    controller = SimpleNamespace(lcd=MackieLcd(), output=object())
+    controller.lcd.apply(0, '8-BitM StGrPn Trmbns LR/Lar SR/Std LH/Con St Out Master ')
+    controller.lcd.apply(56, '0      ' * 7 + '       ')
+    component = SimpleNamespace(parameter_descriptors=[], service=SimpleNamespace(
+        bridge=SimpleNamespace(pool=SimpleNamespace(
+            acquire=lambda _: controller, tracks={'shared': SimpleNamespace(logic_track=1)}))))
+    sent = []
+    instrument = list(button_messages('instrument'))
+    def send(output, messages):
+        batch = list(messages)
+        sent.append(batch)
+        if batch == instrument:
+            controller.lcd.apply(0, 'Track 1 "8-Bit Memories" "Alchemy" Page 1/71'.ljust(56))
+            controller.lcd.apply(56, 'Robotc Cutoff '.ljust(56))
+    monkeypatch.setattr(logic_setup, 'send_all', send)
+    monkeypatch.setattr(logic_setup, '_wait_until', lambda *args: True)
+    monkeypatch.setattr(logic_setup, '_wait_stable_view', lambda c, predicate, timeout: predicate())
+    monkeypatch.setattr(logic_setup.time, 'sleep', lambda _: None)
+    assert logic_setup.activate_parameter_view(component, 'shared') is controller
+    assert sent.count(instrument) == 1
+
+
+def test_scan_value_view_requests_name_header_not_instrument_mode(monkeypatch):
+    from logicprogym import logic_setup
+    from logicprogym.adapters.mackie import button_messages
+    controller = SimpleNamespace(lcd=MackieLcd(), output=object())
+    controller.lcd.apply(0, 'Robotc Cutoff Arp Md Thin   Porto  Res    ArpRat ArpOct ')
+    controller.lcd.apply(56, '46.47% 31.47% Up/Dow 48.86% 23.82% 5.46 % 1/16T  35.12% ')
+    component = SimpleNamespace(parameter_descriptors=[], service=SimpleNamespace(
+        bridge=SimpleNamespace(pool=SimpleNamespace(
+            acquire=lambda _: controller, tracks={'shared': SimpleNamespace(logic_track=1)}))))
+    sent = []
+    toggle = list(button_messages('name_value'))
+    def send(output, messages):
+        batch = list(messages)
+        sent.append(batch)
+        if batch == toggle:
+            controller.lcd.apply(0, 'Track 1 "8-Bit Memories" "Alchemy" Page 1/71'.ljust(56))
+            controller.lcd.apply(56, 'Robotc Cutoff Arp Md Thin   Porto  Res    ArpRat ArpOct ')
+    monkeypatch.setattr(logic_setup, 'send_all', send)
+    monkeypatch.setattr(logic_setup, '_wait_until', lambda *args: True)
+    monkeypatch.setattr(logic_setup, '_wait_stable_view', lambda c, predicate, timeout: predicate())
+    monkeypatch.setattr(logic_setup.time, 'sleep', lambda _: None)
+    assert logic_setup.activate_parameter_view(component, 'shared', scan=True) is controller
+    assert sent.count(toggle) == 1
+    assert list(button_messages('instrument')) not in sent
+
+
+def test_scan_failed_name_toggle_is_bounded_and_rejects_wrong_track(monkeypatch):
+    import pytest
+    from logicprogym import logic_setup
+    from logicprogym.adapters.mackie import button_messages
+    controller = SimpleNamespace(lcd=MackieLcd(), output=object())
+    controller.lcd.apply(0, 'Robotc Cutoff '.ljust(56))
+    controller.lcd.apply(56, '46.47% 31.47% '.ljust(56))
+    component = SimpleNamespace(parameter_descriptors=[], service=SimpleNamespace(
+        bridge=SimpleNamespace(pool=SimpleNamespace(
+            acquire=lambda _: controller, tracks={'shared': SimpleNamespace(logic_track=1)}))))
+    sent = []
+    def send(output, messages):
+        batch = list(messages)
+        sent.append(batch)
+        if batch == list(button_messages('name_value')):
+            controller.lcd.apply(0, 'Track 2 "Other" "Alchemy" Page 1/71'.ljust(56))
+    monkeypatch.setattr(logic_setup, 'send_all', send)
+    monkeypatch.setattr(logic_setup, '_wait_until', lambda *args: True)
+    monkeypatch.setattr(logic_setup, '_wait_stable_view', lambda c, predicate, timeout: predicate())
+    monkeypatch.setattr(logic_setup.time, 'sleep', lambda _: None)
+    with pytest.raises(RuntimeError, match='after Name/Value'):
+        logic_setup.activate_parameter_view(component, 'shared', scan=True)
+    assert sent.count(list(button_messages('name_value'))) == 1

@@ -2,6 +2,11 @@
 
 ## 1.0.0
 
+- Enforce per-track YAML observation selection on reset, steps, snapshots, and
+  frame histories. Omitted `observe` now hides track state; add the required
+  signal names explicitly. Unknown names are rejected. Raw cached LCD diagnostics
+  are excluded from filtered snapshots; selected parameter readings remain.
+
 - Separated musical examples, setup tools and manual live integration checks.
 - Added shared-instrument and separate-track scripted demonstrations with
   public YAMLs, walkthroughs, and finite-run options.

@@ -74,8 +74,8 @@ python examples/logic_multi_agent.py --config configs/my_multi_session.yaml --st
 You should hear separate repeating note patterns with rests, changing synth
 Cutoff, and trombone pitch bends while your piano remains independently playable.
 Logs show held notes, velocity, Cutoff requests, bend requests, human events,
-and available Logic parameter readings with validity and age. Cached LCD text
-is diagnostic, not automatically a confirmed current value. No policy weights
+and selected Logic parameter readings with validity and age. Raw cached LCD
+text is not returned by the configured environment. No policy weights
 are saved; the default reward is zero.
 
 The script sleeps 0.25 seconds between steps, plus control/feedback overhead;

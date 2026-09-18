@@ -2,6 +2,10 @@
 
 These utilities are not musical-agent policies.
 
+For the packaged `logicprogym logic inspect` console and `logicprogym logic scan
+--all`, see [Mackie discovery](../docs/mackie-discovery.md). These setup tools live
+in the package so they are available through the installed CLI.
+
 - `logic_midi_learn.py`: sends messages to assist a Logic Learn-mode assignment;
   this is MIDI assignment learning, not RL training.
 - `logic_midi_cc_test.py`: verifies an existing mapping. Keep Learn Mode off.

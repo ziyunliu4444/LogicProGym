@@ -3,8 +3,10 @@
 Mackie can report the values displayed by Logic. The environment
 exposes accepted numeric readings in `observation['parameter_values']` and
 marks them in `observation['parameter_valid']`. Both arrays use the parameter
-order in `env.unwrapped.registry.parameters`. `parameter_mask` indicates that
-a parameter exists; it does not indicate a valid reading.
+order in `env.unwrapped.registry.parameters`. For YAML sessions, a track must
+include `plugin_parameters` in `observe` to expose its readings. `parameter_mask`
+indicates a discovered, selected parameter; it does not indicate a valid reading.
+Excluded parameters keep their slots but have zero value, mask, and validity.
 
 An unavailable reading has value zero and validity zero. Always check the
 validity mask before interpreting a value; zero can also be a real knob value.
@@ -28,8 +30,10 @@ without a visible page number cannot establish this observation context.
 Raw text, name, unit, address, age and validity are available in
 `info['snapshot'].diagnostics['parameter_readings']` for Mackie-only sessions,
 or `info['snapshot'].diagnostics['mackie']['parameter_readings']` for hybrid
-sessions. General cached LCD output remains available separately. The public
-API and multi-agent examples print the accepted readings for human inspection.
+sessions. These dictionaries contain only selected parameters. Unverified cached
+LCD/page data is excluded from YAML environment snapshots because it may contain
+unrelated state. The public API and multi-agent examples print the selected
+readings for human inspection. See [observation selection](yaml-configuration.md#tracks-and-observations).
 
 ## Live acceptance
 

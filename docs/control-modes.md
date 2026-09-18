@@ -1,5 +1,8 @@
 # Choose what agents control
 
+For complete configuration syntax, defaults, and custom-action examples, see
+the [YAML tutorial and field reference](yaml-configuration.md).
+
 If an existing CC assignment stops responding, verify its input bus, channel,
 CC number and target instrument. Prefer a fixed agent channel strip over
 Selected Track when the human plays another track. Use Unsigned / Scaled and

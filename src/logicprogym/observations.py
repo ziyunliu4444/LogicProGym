@@ -25,9 +25,13 @@ SOURCE_CODES = {EventSource.HUMAN: 0, EventSource.AGENT: 1, EventSource.DAW: 2}
 class ObservationBuilder:
     """Maintain active notes and encode recent DAW events with provenance."""
 
-    def __init__(self, registry: SessionRegistry, event_capacity: int) -> None:
+    def __init__(self, registry: SessionRegistry, event_capacity: int, *,
+                 note_activity_from_kind: bool = False) -> None:
         if event_capacity <= 0:
             raise ValueError("Event capacity must be positive")
+        # Selected snapshots already normalize velocity-zero note-ons to releases.
+        # A remaining note-on may have a masked velocity of zero and is still on.
+        self.note_activity_from_kind = note_activity_from_kind
         self.registry = registry
         self.event_capacity = event_capacity
         # Per track and MIDI note: active flag, onset velocity, source code.
@@ -51,7 +55,7 @@ class ObservationBuilder:
         if not 0 <= note < 128:
             raise ValueError(f"Invalid MIDI note in event: {note}")
         velocity = float(event.values.get("velocity", 0.0))
-        is_on = event.kind == "note_on" and velocity > 0.0
+        is_on = event.kind == "note_on" and (velocity > 0.0 or self.note_activity_from_kind)
         self._active_notes[track_slot, note] = (
             [1.0, velocity, float(SOURCE_CODES[event.source])]
             if is_on

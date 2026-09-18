@@ -71,7 +71,7 @@ def supervise(worker_target, cleanup_timeout=10.0):
 
 
 
-def run_demo(policy, description, *, on_cleanup=None):
+def run_demo(policy, description, *, on_cleanup=None, on_step=None, allow_read_only=False):
     """Run one deterministic musical policy through the public Gymnasium API.
 
     The YAML owns hardware routing. CLI options control only run duration/rate.
@@ -85,6 +85,9 @@ def run_demo(policy, description, *, on_cleanup=None):
     parser.add_argument('config', help='Configured session YAML')
     parser.add_argument('--steps', type=int, default=120, help='0 runs until Ctrl-C')
     parser.add_argument('--control-hz', type=float, default=2.0)
+    if allow_read_only:
+        parser.add_argument('--read-only', action='store_true',
+                            help='Send zero parameter movements; monitor manual knob changes')
     args = parser.parse_args()
     if args.steps < 0:
         parser.error('--steps must be nonnegative')
@@ -97,10 +100,14 @@ def run_demo(policy, description, *, on_cleanup=None):
             raise ValueError('Policy actions do not match the YAML; use this demo’s template')
         env.reset()
         print('Play the human track. Scripted policy running; Ctrl-C stops.', flush=True)
+        if getattr(args, 'read_only', False):
+            print('Read-only: no parameter movements requested; move knobs in Logic manually.', flush=True)
         step = 0
         while args.steps == 0 or step < args.steps:
             started = time.monotonic()
             action = policy(step, args.control_hz)
+            if getattr(args, 'read_only', False):
+                action = {key: np.zeros_like(value) for key, value in action.items()}
             if not env.action_space.contains(action):
                 raise ValueError('Policy emitted an action outside the declared space')
             _, reward, terminated, truncated, info = env.step(action)
@@ -116,6 +123,8 @@ def run_demo(policy, description, *, on_cleanup=None):
                 for event in snapshot.events:
                     if str(getattr(event.source, 'value', event.source)) == 'human':
                         print(f'HUMAN {event.kind} {event.values}', flush=True)
+            if on_step is not None:
+                on_step(info, env)
             step += 1
             if terminated or truncated:
                 break

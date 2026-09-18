@@ -20,6 +20,9 @@ use an extra: `python -m pip install -e '.[test]'`.
 - Per-track MIDI-only, Mackie-only or combined control.
 - Notes, velocity, pitch bend and explicitly mapped MIDI CC actions.
 - Human MIDI input observations, Mackie value diagnostics and optional audio.
+- Per-track observation selection through `observe`; omitted or empty lists
+  hide that track's musical state without disabling its actions. Audio capture
+  is separately enabled and remains a mix rather than isolated track audio.
 - Opt-in [control resets](reset-controls.md), [timing and manifests](experiment-reproducibility.md),
   and [frame observations](frame-observations.md).
 - Gymnasium construction through `gym.make("LogicProGym/Logic-v0", config_path=...)`.

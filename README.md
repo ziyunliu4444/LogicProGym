@@ -74,6 +74,8 @@ The preview opens no ports. Doctor checks configured port names but cannot prove
 your routing inside Logic. The connection check sends notes: start with a comfortable
 monitoring volume. Ctrl-C requests shutdown and agent-note cleanup.
 
+Need to define your own controls? See the [YAML tutorial and field reference](docs/yaml-configuration.md).
+
 ## Choose an example
 
 See the [musical-agent catalogue](examples/README.md) for runnable policies.
@@ -102,6 +104,10 @@ Replace `YOUR_KEYBOARD_INPUT`, `YOUR_AGENT_OUTPUT` and, where used,
 Instrument parameter names and page/slot addresses also depend on your preset.
 Scan and verify them before using Mackie templates. The [control modes guide](docs/control-modes.md)
 explains how to enable only the actions you want.
+
+The [Mackie inspector and discovery guide](docs/mackie-discovery.md) shows how to
+browse pages, test a knob, and load selected controls from a scanned catalog
+without typing parameter names.
 
 ## Use Gymnasium directly
 

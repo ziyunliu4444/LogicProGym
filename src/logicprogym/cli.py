@@ -105,20 +105,27 @@ def _verify_mackie(env, config_data):
     return tuple(results)
 
 
-def logic_scan(config: Path, track_id: str, pages: int, output: Path, start_page=None) -> int:
+def logic_scan(config: Path, track_id: str, pages: int | None, output: Path, start_page=None) -> int:
     """Connect to Logic, scan one instrument, and save its parameter catalog."""
 
     from logicprogym.logic_setup import mackie_adapter, scan_parameters, save_catalog
     env = make(config)
+    component = None
     try:
-        env.reset()
         component = mackie_adapter(env)
+        # Setup tools open only control-surface endpoints, not notes/audio or
+        # configured episode-reset controls.
+        component.connect()
         bridge = component.service.bridge
         if bridge is None or track_id not in bridge.pool.tracks:
             choices = "none" if bridge is None else ", ".join(bridge.pool.tracks)
             raise ValueError(f"Unknown Mackie track {track_id!r}; choices: {choices}")
         track = bridge.pool.tracks[track_id]
-        found = scan_parameters(component, track_id, pages=pages, start_page=start_page)
+        def report(page):
+            names = ', '.join(item['name'] for item in page['parameters'])
+            print(f"Page {page['page']}: {names or '(no names returned)'}", flush=True)
+        found = scan_parameters(component, track_id, pages=pages, start_page=start_page,
+                                on_page=report)
         controller = bridge.pool.acquire(track_id)
         save_catalog(
             output,
@@ -127,13 +134,14 @@ def logic_scan(config: Path, track_id: str, pages: int, output: Path, start_page
             controller=controller.index + 1,
             pages=found,
         )
-        for page in found:
-            names = ", ".join(item["name"] for item in page["parameters"])
-            print(f"Page {page['page']}: {names or '(no names returned)'}")
         print(f"Saved {len(found)} page(s) to {output}")
         return 0
     finally:
-        env.close()
+        try:
+            if component is not None:
+                component.close()
+        finally:
+            env.close()
 
 
 def devices(as_json: bool = False) -> int:
@@ -179,12 +187,17 @@ def main() -> None:
     scan_parser = logic_commands.add_parser("scan", help="scan Instrument parameters")
     scan_parser.add_argument("config", type=Path)
     scan_parser.add_argument("--track", required=True, dest="track_id")
-    scan_parser.add_argument("--pages", type=int, default=1)
+    page_group = scan_parser.add_mutually_exclusive_group()
+    page_group.add_argument("--pages", type=int, default=1)
+    page_group.add_argument("--all", action="store_true", help="discover and scan all reported pages (up to 256)")
     scan_parser.add_argument("--start-page", type=int,
                              help="Explicit current page when Logic truncates the page number")
     scan_parser.add_argument(
         "--output", type=Path, default=Path("configs/logic_mackie_catalog.yaml")
     )
+    inspect_parser = logic_commands.add_parser('inspect', help='interactively browse Mackie pages and test V-Pots')
+    inspect_parser.add_argument('config', type=Path)
+    inspect_parser.add_argument('--track', required=True, dest='track_id')
     preview_parser = commands.add_parser('preview', help='show enabled track controls without connecting to Logic')
     preview_parser.add_argument('config', type=Path)
     args = parser.parse_args()
@@ -197,7 +210,10 @@ def main() -> None:
     if args.command == "doctor":
         raise SystemExit(doctor(args.config, args.as_json, args.live))
     if args.command == "logic" and args.logic_command == "scan":
-        raise SystemExit(logic_scan(args.config, args.track_id, args.pages, args.output, args.start_page))
+        raise SystemExit(logic_scan(args.config, args.track_id, None if args.all else args.pages, args.output, args.start_page))
+    if args.command == 'logic' and args.logic_command == 'inspect':
+        from logicprogym.mackie_inspector import inspect_session
+        raise SystemExit(inspect_session(args.config, args.track_id))
 
 
 if __name__ == "__main__":

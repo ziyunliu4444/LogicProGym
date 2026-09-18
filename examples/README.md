@@ -14,6 +14,8 @@ expected behavior, stopping, and troubleshooting. No private files are needed.
 | Let audio energy drive a knob | Scripted, audio-conditioned | [Audio agent](../docs/audio-input.md#example-an-agent-acts-on-raw-audio) | `logic_audio_agent.py` | `logic_audio_agent.yaml` |
 | Inspect MIDI/audio in fixed-duration frames | Observation only | [Frame observer](../docs/frame-observations.md#observation-only-example) | `logic_frame_observer.py` | `logic_frames.yaml` |
 
+To customize a session, use the [YAML tutorial and field reference](../docs/yaml-configuration.md).
+
 ## Before starting
 
 Follow the [installation guide](../docs/logic-setup.md#1-install-logicprogym).

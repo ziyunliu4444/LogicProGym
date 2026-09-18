@@ -113,9 +113,13 @@ class LogicProGymConfig:
 
         with Path(path).open(encoding="utf-8") as stream:
             raw = yaml.safe_load(stream) or {}
+        from logicprogym.parameter_catalog import resolve_catalogs
+        raw = resolve_catalogs(raw, path)
         tracks: list[TrackConfig] = []
         for track_raw in raw.get("tracks", ()):
             alias = str(track_raw["alias"])
+            if not isinstance(track_raw.get("observe", []), list):
+                raise ValueError(f"{alias}: observe must be a list of observation names")
             tracks.append(
                 TrackConfig(
                     alias=alias,
@@ -128,6 +132,9 @@ class LogicProGymConfig:
         aliases = [track.alias for track in tracks]
         if len(aliases) != len(set(aliases)):
             raise ValueError("Track aliases must be unique")
+
+        from logicprogym.observation_selection import ObservationSelection
+        ObservationSelection({track.alias: track.observe for track in tracks})
 
         return cls(
             adapter=dict(raw.get("adapter", {})),

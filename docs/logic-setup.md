@@ -107,6 +107,9 @@ not prevent later instrument or preset changes during training.
 
 ## 5. Scan instrument parameters
 
+For interactive browsing, name-free setup, all-page discovery, and catalog
+references in YAML, see [Mackie discovery](mackie-discovery.md).
+
 Scan the first two Mackie Instrument pages and save their page/slot/name map:
 
 ```bash

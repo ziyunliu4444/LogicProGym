@@ -18,7 +18,7 @@ def required_capabilities(
         required.add("agent_output")
     if len({action.track_id for action in actions}) > 1:
         required.add("multiple_tracks")
-    if any(action.target.startswith("plugin.") for action in actions):
+    if "plugin_parameters" in observed_fields or any(action.target.startswith("plugin.") for action in actions):
         required.add("plugin_parameters")
     if any(action.target.startswith("mixer.") for action in actions):
         required.add("mixer_parameters")

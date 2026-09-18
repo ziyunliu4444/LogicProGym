@@ -8,6 +8,7 @@ names; personal configurations are not bundled.
 ## Getting started
 
 - [Install and configure Logic](logic-setup.md)
+- [Write session YAML: tutorial and field reference](yaml-configuration.md)
 - [Choose MIDI, Mackie, or combined controls](control-modes.md)
 - [Support scope and limitations](release-status.md)
 - [Reconnect virtual control surfaces](renaming.md)
@@ -25,6 +26,7 @@ names; personal configurations are not bundled.
 
 ## Setup checks and troubleshooting
 
+- [Interactive Mackie inspection and automatic discovery](mackie-discovery.md)
 - [MIDI assignment tools](../tools/README.md)
 - [Manual live checks](../live_tests/README.md)
 - [Validate your live setup](logic-1.0-acceptance.md)
