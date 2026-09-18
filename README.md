@@ -4,7 +4,7 @@ A Gymnasium interface for learning agents that make music alongside humans in
 Logic Pro. Configure what each track can observe and control, then use standard
 Gymnasium `reset()`, `step()`, action spaces and wrappers.
 
-**1.0.0 · MIT · macOS + Logic Pro**
+**MIT · macOS + Logic Pro**
 
 **Find your next step:** [Setup tools](tools/README.md) ·
 [Musical examples](examples/README.md) · [Write YAML](docs/yaml-configuration.md) ·
