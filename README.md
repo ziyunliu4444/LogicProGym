@@ -154,6 +154,23 @@ design. Generated Mackie ports start with `LogicProGym Control`; they are
 application-created endpoints, not keyboard names. If Logic has stale endpoint
 state, follow the [reconnection guide](docs/renaming.md).
 
+## Citation
+
+If you use LogicProGym in your research, please cite our ISMIR 2026
+Late-Breaking Demo (LBD) extended abstract:
+
+```bibtex
+@inproceedings{logicprogym2026,
+  author    = {Liu, Ziyun and D{\'e}guernel, Ken and Berthaut, Florent},
+  title     = {{LogicProGym}: Creating a Shared Musical Environment
+               for Humans and Learning Agents},
+  booktitle = {Extended Abstracts for the Late-Breaking Demo Session
+               of the 27th International Society for Music Information
+               Retrieval Conference},
+  year      = {2026}
+}
+```
+
 ## Repository layout
 
 | Folder | Purpose |
