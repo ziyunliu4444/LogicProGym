@@ -28,6 +28,15 @@ def make_action(space, track, note):
     return action
 
 
+def _isolated_worker(worker_target, sender):
+    # Terminal Ctrl-C belongs to the supervisor. It forwards one interrupt;
+    # receiving both the terminal signal and the forwarded signal can abort
+    # the worker's finally block while it is releasing MIDI notes.
+    if hasattr(os, 'setpgrp'):
+        os.setpgrp()
+    worker_target(sender)
+
+
 def supervise(worker_target, cleanup_timeout=10.0):
     """CLI-only guard: a separate process can stop even a GIL-held native hang.
 
@@ -36,7 +45,7 @@ def supervise(worker_target, cleanup_timeout=10.0):
     """
     context = multiprocessing.get_context('spawn')
     receiver, sender = context.Pipe(duplex=False)
-    worker = context.Process(target=worker_target, args=(sender,))
+    worker = context.Process(target=_isolated_worker, args=(worker_target, sender))
     worker.start()
     sender.close()
     deadline = None
