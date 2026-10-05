@@ -17,7 +17,7 @@ Gymnasium `reset()`, `step()`, action spaces and wrappers.
 - Human MIDI note and controller observations.
 - Raw audio observations from Logic, or a configured audio input device.
 - MIDI-only, Mackie-only or combined control for each agent track.
-- Examples for multiple tracks, policy training, human feedback and audio input.
+- Examples for multiple tracks, policy training and audio input.
 
 Rewards are task-specific: the default environment reward is zero. The examples
 demonstrate possible policies and rewards, not a pretrained musical agent.
@@ -100,7 +100,7 @@ Replace `YOUR_KEYBOARD_INPUT`, `YOUR_AGENT_OUTPUT` and, where used,
 
 The [example catalogue](examples/README.md) pairs each musical scenario with its
 script, configuration, and walkthrough: shared or separate instruments, two-agent
-performance, pitch training, human feedback, audio-driven control, and frame observation.
+performance, pitch training, audio-driven control, and frame observation.
 
 Instrument parameter names and page/slot addresses also depend on your preset.
 Scan and verify them before using Mackie templates. The [control modes guide](docs/control-modes.md)

@@ -9,7 +9,6 @@ include live_tests/logic_cutoff_reset_test.py
 include live_tests/logic_public_api.py
 include examples/logic_multi_agent.py
 include examples/logic_train_policy.py
-include examples/logic_human_feedback.py
 include tools/logic_midi_learn.py
 include tools/logic_midi_cc_test.py
 include live_tests/logic_audio_test.py

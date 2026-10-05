@@ -8,17 +8,15 @@ Logic. Look for `Saved ...` to confirm persistence. Normal cleanup exits normall
 The supervisor is specific to this CLI example; it does not forcibly exit code
 using the Gymnasium environment directly.
 
-The public training examples save weights, optimizer state, random-generator
-state, and the parsed session YAML in their checkpoint. They also record the
+The pitch-training example saves weights, optimizer state, random-generator
+state, and the parsed session YAML in its checkpoint. It also records the
 package version, Python version, and operating system. Resume rejects a changed
 session configuration before opening MIDI ports. Moving an unchanged YAML file
 is fine. Older checkpoints without session metadata require a new training run;
 they are not silently migrated. Only load checkpoints you trust.
 
-Default output files are `artifacts/pitch_policy.pt` and
-`artifacts/human_feedback.pt`; `--checkpoint` selects another file. Feedback
-channel overrides are recorded in the feedback settings as well as the original
-YAML. These files do **not** save instrument presets or restore Logic state.
+The default output file is `artifacts/pitch_policy.pt`; `--checkpoint` selects
+another file. Checkpoints do **not** save instrument presets or restore Logic state.
 Save the Logic project separately alongside the YAML and checkpoint. Session
 YAML can contain local port names and paths; review it before sharing weights.
 
@@ -33,11 +31,10 @@ Record the exact Logic and macOS versions with the following live results:
 - Test both finite completion and Ctrl-C, checking for stuck notes afterwards.
 - Repeat opening, stepping, and closing in one Python process. Automated tests
   cover this lifecycle with a fake adapter, not native MIDI hardware.
-- Test positive and negative feedback on channel 1, then save/resume the policy.
-  Confirm an unrated phrase does not update the policy.
+- Save and resume the pitch-training policy; confirm training progress is retained.
 
 For initial setup validation, use **one active Mackie controller** with
 configured MIDI tracks. Independent multiple-Mackie operation remains
 experimental. Cached LCD text is diagnostic only; it is not a confirmed fresh
 parameter value and must not be used as a reward measurement. The included
-pitch and human-rating rewards do not depend on cached Mackie values.
+pitch reward does not depend on cached Mackie values.

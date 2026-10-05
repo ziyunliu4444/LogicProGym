@@ -361,9 +361,6 @@ baselines, not captured initial knob positions; see [reset examples](reset-contr
 - Episode length: pass `max_episode_steps` to `gym.make`, or use an example's
   `--steps`/`--episodes` option. There is no general YAML `steps` setting.
 - Training/checkpoint options, unless a particular example documents otherwise.
-  The top-level `feedback` section is specific to `logic_human_feedback.py`,
-  not a general environment feature. Its channel is 1..16, unlike MIDI route
-  channels; see the [feedback walkthrough](human-midi-feedback.md).
 
 ## Before running a custom policy
 
