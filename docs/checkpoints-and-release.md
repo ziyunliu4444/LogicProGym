@@ -8,15 +8,16 @@ Logic. Look for `Saved ...` to confirm persistence. Normal cleanup exits normall
 The supervisor is specific to this CLI example; it does not forcibly exit code
 using the Gymnasium environment directly.
 
-The pitch-training example saves weights, optimizer state, random-generator
-state, and the parsed session YAML in its checkpoint. It also records the
+The training examples save weights, optimizer state, random-generator
+state, and the parsed session YAML in their checkpoints. They also record the
 package version, Python version, and operating system. Resume rejects a changed
 session configuration before opening MIDI ports. Moving an unchanged YAML file
 is fine. Older checkpoints without session metadata require a new training run;
 they are not silently migrated. Only load checkpoints you trust.
 
-The default output file is `artifacts/pitch_policy.pt`; `--checkpoint` selects
-another file. Checkpoints do **not** save instrument presets or restore Logic state.
+The default files are `artifacts/pitch_policy.pt` and `artifacts/human_feedback.pt`;
+`--checkpoint` selects another file. Human-feedback checkpoints also validate
+the phrase/rating settings, including any feedback-channel override. Checkpoints do **not** save instrument presets or restore Logic state.
 Save the Logic project separately alongside the YAML and checkpoint. Session
 YAML can contain local port names and paths; review it before sharing weights.
 

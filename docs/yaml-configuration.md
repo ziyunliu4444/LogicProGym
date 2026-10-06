@@ -361,6 +361,9 @@ baselines, not captured initial knob positions; see [reset examples](reset-contr
 - Episode length: pass `max_episode_steps` to `gym.make`, or use an example's
   `--steps`/`--episodes` option. There is no general YAML `steps` setting.
 - Training/checkpoint options, unless a particular example documents otherwise.
+  The human-feedback example reads its own task-specific `feedback` section.
+  Keyboard input and observation access still belong to the normal adapter
+  routes and track `observe` fields; see [human feedback](human-midi-feedback.md).
 
 ## Before running a custom policy
 

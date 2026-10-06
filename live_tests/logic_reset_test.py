@@ -9,10 +9,36 @@ import argparse
 import time
 
 import gymnasium as gym
+import numpy as np
 import yaml
 import logicprogym
 
-from logicprogym.example_support import make_action, supervise
+try:
+    from ._cli_shutdown import supervise
+except ImportError:
+    from _cli_shutdown import supervise
+
+
+def make_action(space, track, note):
+    """Build a neutral action for the expressive-instrument configuration."""
+    action = {}
+    for key, subspace in space.spaces.items():
+        if not isinstance(subspace, (gym.spaces.Box, gym.spaces.MultiBinary)):
+            raise ValueError(f"Unsupported action {key}: use the expressive_instrument preset")
+        value = np.zeros(subspace.shape, dtype=subspace.dtype)
+        if key.endswith('/velocity'):
+            value.fill(0.5)
+        elif key.endswith('/expression'):
+            value.fill(0.75)
+        if isinstance(subspace, gym.spaces.Box):
+            value = np.clip(value, subspace.low, subspace.high)
+        action[key] = value
+    if note is not None:
+        action[f'{track}/note_gate'][note] = 1
+    if not space.contains(action):
+        raise ValueError('Configuration is incompatible with this example')
+    return action
+
 
 
 def main(on_cleanup=None):

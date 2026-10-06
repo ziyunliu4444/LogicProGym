@@ -9,7 +9,13 @@ import re
 import time
 from dataclasses import replace
 import numpy as np
-from logicprogym.example_support import run_demo, supervise
+import argparse
+import gymnasium as gym
+import logicprogym
+try:  # Support both module imports and direct script execution.
+    from ._cli_shutdown import supervise
+except ImportError:
+    from _cli_shutdown import supervise
 
 
 def agent_action(step: int, control_hz: float) -> dict[str, np.ndarray]:
@@ -53,9 +59,60 @@ def print_parameter_readings(info):
 
 
 def main(on_cleanup=None):
-    run_demo(agent_action, __doc__, on_cleanup=on_cleanup,
-             on_step=print_after_feedback, allow_read_only=True)
-
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('config', help='Configured session YAML')
+    parser.add_argument('--steps', type=int, default=120, help='0 runs until Ctrl-C')
+    parser.add_argument('--control-hz', type=float, default=2.0)
+    parser.add_argument('--read-only', action='store_true',
+                            help='Send zero parameter movements; monitor manual knob changes')
+    args = parser.parse_args()
+    if args.steps < 0:
+        parser.error('--steps must be nonnegative')
+    if not math.isfinite(args.control_hz) or not 0 < args.control_hz <= 50:
+        parser.error('--control-hz must be finite, greater than 0 and at most 50')
+    options = {} if args.steps == 0 else {'max_episode_steps': args.steps}
+    env = gym.make(logicprogym.ENV_ID, config_path=args.config, **options)
+    try:
+        if not env.action_space.contains(agent_action(0, args.control_hz)):
+            raise ValueError('Policy actions do not match the YAML; use this demo’s template')
+        observation, info = env.reset()
+        print('Play the human track. Scripted policy running; Ctrl-C stops.', flush=True)
+        if getattr(args, 'read_only', False):
+            print('Read-only: no parameter movements requested; move knobs in Logic manually.', flush=True)
+        step = 0
+        while args.steps == 0 or step < args.steps:
+            started = time.monotonic()
+            action = agent_action(step, args.control_hz)
+            if getattr(args, 'read_only', False):
+                action = {key: np.zeros_like(value) for key, value in action.items()}
+            if not env.action_space.contains(action):
+                raise ValueError('Policy emitted an action outside the declared space')
+            observation, reward, terminated, truncated, info = env.step(action)
+            requests = {}
+            for key, value in action.items():
+                if key.endswith('/note_gate'):
+                    requests[key] = np.flatnonzero(value).tolist()
+                elif key.endswith('/parameter_vector'):
+                    requests[key] = np.round(value, 3).tolist()
+            print(f'step={step+1} requested={requests} reward={reward:+.4f}', flush=True)
+            snapshot = info.get('snapshot')
+            if snapshot is not None:
+                for event in snapshot.events:
+                    if str(getattr(event.source, 'value', event.source)) == 'human':
+                        print(f'HUMAN {event.kind} {event.values}', flush=True)
+            print_after_feedback(info, env)
+            step += 1
+            if terminated or truncated:
+                break
+            time.sleep(max(0.0, 1.0/args.control_hz - (time.monotonic()-started)))
+    except KeyboardInterrupt:
+        print('Stopping demonstration...', flush=True)
+    finally:
+        print('Releasing agent notes and closing...', flush=True)
+        if on_cleanup is not None:
+            on_cleanup()
+        env.close()
+        print('Environment closed.', flush=True)
 
 def print_after_feedback(info, env, *, feedback_seconds=0.3):
     """Collect asynchronous feedback after movement, before the next action.

@@ -76,6 +76,8 @@ class ObservationSelection:
                 continue
             if '_received_monotonic' in values:
                 selected['_received_monotonic'] = values['_received_monotonic']
+            if 'channel' in values:
+                selected['channel'] = values['channel']
             events.append(replace(event, kind=kind, values=deepcopy(selected)))
 
         def diagnostics(raw):

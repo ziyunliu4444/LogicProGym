@@ -17,7 +17,7 @@ def main():
     base = Path(sys.prefix) / 'share/logicprogym'
     templates = ('logic_midi_only.yaml', 'logic_mackie_only.yaml',
                  'logic_human_agent.yaml', 'logic_two_agents.yaml',
-                 'logic_audio_agent.yaml', 'logic_frames.yaml',
+                 'logic_human_feedback.yaml', 'logic_audio_agent.yaml', 'logic_frames.yaml',
                  'logic_cutoff_reset.yaml', 'logic_shared_track.yaml', 'logic_split_tracks.yaml')
     for filename in templates:
         path = base / 'configs' / filename

@@ -216,8 +216,10 @@ class LogicMidiAdapter(LogicProAdapter):
             values = {"control": message.control, "value": message.value / 127.0}
         else:
             return
-        if hasattr(self, "_frame_events"):
-            values["_received_monotonic"] = monotonic()
+        # Preserve receipt time and wire channel for tasks interpreting MIDI
+        # responses. This clock describes local receipt, not Logic audio time.
+        values["_received_monotonic"] = monotonic()
+        values["channel"] = message.channel
         event = DawEvent(
                 timestamp_samples=self._sample_position(),
                 track_id=route.track_id,

@@ -5,7 +5,6 @@ from types import SimpleNamespace
 from logicprogym.models import DawSnapshot
 import logicprogym
 from examples import logic_shared_track, logic_split_tracks
-from logicprogym import example_support
 
 
 @pytest.mark.parametrize('module,template', [
@@ -41,7 +40,7 @@ def test_demo_runs_bounded_and_closes(monkeypatch):
         def close(self):
             calls.append('close')
     monkeypatch.setattr(gym, 'make', lambda *a, **k: Fake())
-    monkeypatch.setattr(example_support.time, 'sleep', lambda _: None)
+    monkeypatch.setattr(logic_split_tracks.time, 'sleep', lambda _: None)
     monkeypatch.setattr('sys.argv', ['demo', 'unused.yaml', '--steps', '3'])
     logic_split_tracks.main(on_cleanup=lambda: calls.append('cleanup'))
     assert calls == ['reset', 'step', 'step', 'step', 'cleanup', 'close']
@@ -97,3 +96,32 @@ def test_display_fallback_is_not_confirmed_and_respects_selection(capsys):
     reports = {'cutoff': dict(name='Cutoff', valid=False)}
     logic_shared_track.collect_display_text(mackie, reports)
     assert 'display_raw' not in reports['cutoff']
+
+
+@pytest.mark.parametrize('read_only', [False, True])
+def test_shared_demo_calls_environment_and_preserves_read_only(monkeypatch, read_only):
+    import numpy as np
+    schema = gym.make(logicprogym.ENV_ID,
+                      config_path='configs/examples/logic_shared_track.yaml')
+    actions, lifecycle = [], []
+    class Fake:
+        action_space = schema.action_space
+        def reset(self):
+            lifecycle.append('reset')
+            return {}, {}
+        def step(self, action):
+            assert self.action_space.contains(action)
+            actions.append(action)
+            return {}, 0., False, False, {}
+        def close(self):
+            lifecycle.append('close')
+    monkeypatch.setattr(gym, 'make', lambda *a, **k: Fake())
+    monkeypatch.setattr(logic_shared_track.time, 'sleep', lambda _: None)
+    monkeypatch.setattr(logic_shared_track, 'print_after_feedback', lambda *a: None)
+    argv = ['demo', 'unused.yaml', '--steps', '3'] + (['--read-only'] if read_only else [])
+    monkeypatch.setattr('sys.argv', argv)
+    logic_shared_track.main()
+    assert lifecycle == ['reset', 'close']
+    assert len(actions) == 3
+    assert all(np.count_nonzero(a['shared/parameter_vector']) == 0 for a in actions) == read_only
+    schema.close()

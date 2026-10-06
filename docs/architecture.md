@@ -87,8 +87,10 @@ and [reset semantics](reset-controls.md) for details.
 
 Public musical demonstrations live in `examples/`, setup helpers in `tools/`,
 and manual hardware checks in `live_tests/`. Automated tests remain in `tests/`.
-`src/logicprogym/example_support.py` contains shared demonstration action and
-CLI-lifecycle helpers; it does not change the reusable environment's behavior.
+Examples show environment construction, `reset()`, `step()` and `close()`
+directly in their own scripts. Policies and action construction are example code.
+Private `_cli_shutdown.py` utilities guard live CLI processes against native
+shutdown hangs; they contain no musical interaction loops.
 
 - **Existing MIDI control:** start with YAML. A new mapping often needs no Python.
 - **New action encoding:** update the action specification/compiler, stateful

@@ -10,7 +10,10 @@ import gymnasium as gym
 import logicprogym
 from logicprogym.config import LogicProGymConfig
 
-from logicprogym.example_support import supervise
+try:
+    from ._cli_shutdown import supervise
+except ImportError:
+    from _cli_shutdown import supervise
 
 
 def main(on_cleanup=None):
