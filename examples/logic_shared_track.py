@@ -28,24 +28,12 @@ def agent_action(step: int, control_hz: float) -> dict[str, np.ndarray]:
 
 def print_parameter_readings(info):
     """Show selected feedback, never infer knob positions from sent actions."""
-    snapshot = info.get('snapshot')
-    diagnostics = {} if snapshot is None else snapshot.diagnostics
-    readings = diagnostics.get('mackie', diagnostics).get('parameter_readings', {})
+    readings = logicprogym.parameter_readings(info)
     if not readings:
         print('KNOBS no selected readings; enable plugin_parameters in shared.observe.', flush=True)
-        return
-    for parameter_id, reading in readings.items():
-        name = reading.get('name', parameter_id)
-        raw = reading.get('raw')
-        age = reading.get('age_seconds')
-        age_text = '' if age is None else f' age={age:.2f}s'
-        if reading.get('valid') and raw is not None:
-            status = f"reported={raw!r} valid=True{age_text}"
-        elif raw is not None:
-            status = f"unavailable last_reported={raw!r} valid=False{age_text}"
-        else:
-            status = 'waiting for matched numeric feedback'
-        print(f'KNOB {name} [{parameter_id}] {status}', flush=True)
+    for reading in readings.values():
+        print(f'KNOB {reading.name} [{reading.id}] raw={reading.raw!r} '
+              f'age={reading.age_seconds} value={reading.value} valid={reading.valid}', flush=True)
 
 
 def main(on_cleanup=None):

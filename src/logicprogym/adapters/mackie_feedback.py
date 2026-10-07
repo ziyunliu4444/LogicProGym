@@ -21,14 +21,21 @@ class MackieFeedback:
         self.context = {}
         self.touched = {}
         self.readings = {}
+        self.raw_readings = {}
+        self.raw_context = {}
+        self.raw_slots = set()
         self.lock = RLock()
 
-    def invalidate(self):
+    def invalidate(self, *, clear_raw=False):
         """Require a new observed header after selection or parameter commands."""
         with self.lock:
             self.context.clear()
             self.touched.clear()
             self.readings.clear()
+            if clear_raw:
+                self.raw_readings.clear()
+                self.raw_context.clear()
+                self.raw_slots.clear()
 
     def ingest(self, number, lcd, message):
         update = parse_lcd_update(message)
@@ -40,6 +47,37 @@ class MackieFeedback:
             touched = self.touched.setdefault(number, set())
             updated = set(range(max(0, offset), min(112, offset + len(text))))
             touched.update(updated)
+            header = instrument_header(lcd)
+            if header and header.get('page') is not None:
+                address = (header['track'], header['page'][0])
+                if self.raw_context.get(number) != address:
+                    self.raw_slots.difference_update(
+                        b['id'] for b in self.bindings if b['controller'] == number)
+                self.raw_context[number] = address
+                # Logic's overview puts slot names on the LOWER row. After a
+                # turn it may use a different label above (Robotc -> Robotic).
+                for binding in self.bindings:
+                    if (binding['controller'] == number
+                            and address == (binding['track'], binding['page'])
+                            and lcd.strips[binding['slot'] - 1][1].casefold()
+                            == binding['name'].casefold()):
+                        self.raw_slots.add(binding['id'])
+            # Capture at receipt time, before another update replaces a slot.
+            # Raw text is historical display feedback, not numeric validity.
+            for binding in self.bindings:
+                start = (binding['slot'] - 1) * 7
+                lower = set(range(56 + start, 63 + start))
+                if binding['controller'] != number or not lower & updated:
+                    continue
+                name, raw = lcd.strips[binding['slot'] - 1]
+                overview_names = {b['name'].casefold() for b in self.bindings
+                                  if b['controller'] == number}
+                matched = name.casefold() == binding['name'].casefold()
+                addressed = binding['id'] in self.raw_slots
+                if ((matched or addressed) and raw.strip()
+                        and raw.casefold() not in overview_names):
+                    self.raw_readings[binding['id']] = dict(
+                        display_name=name, display_raw=raw, display_received_at=now)
             for binding in self.bindings:
                 start = (binding['slot'] - 1) * 7
                 cells = set(range(start, start + 7)) | set(range(56 + start, 63 + start))
@@ -99,6 +137,10 @@ class MackieFeedback:
             for binding in self.bindings:
                 reading = self.readings.get(binding['id'])
                 detail = dict(name=binding['name'], valid=False, age_seconds=None)
+                raw_reading = self.raw_readings.get(binding['id'])
+                if raw_reading:
+                    detail.update(raw_reading, display_age_seconds=max(
+                        0.0, now - raw_reading['display_received_at']))
                 if reading:
                     age = max(0.0, now - reading['received_at'])
                     valid = age <= self.max_age and self.context.get(reading['controller']) == (reading['track'], reading['page'])

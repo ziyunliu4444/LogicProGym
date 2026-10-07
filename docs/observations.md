@@ -170,14 +170,25 @@ bare numeric readings retain their displayed units. Text labels and fractions
 such as `1/16` are not available as numeric values. A valid reading does not
 acknowledge an action or prove that the action moved a knob.
 
-For selected raw text, names, units, age, and validity:
+For raw text and numeric feedback, use the public interface. It works for
+Mackie-only and hybrid environments without backend-specific dictionary access:
 
 ```python
-diagnostics = info["snapshot"].diagnostics
-mackie = diagnostics.get("mackie", diagnostics)  # Hybrid or Mackie-only.
-readings = mackie.get("parameter_readings", {})
-print(readings.get("agent/page_1/slot_2"))
+readings = logicprogym.parameter_readings(info)
+cutoff = readings.get("agent/page_1/slot_2")
+if cutoff is not None:
+    print(cutoff.name, cutoff.raw, cutoff.age_seconds)
+    if cutoff.valid:
+        print("Accepted numeric value:", cutoff.value)
 ```
+
+Each immutable `ParameterReading` has `id`, `name`, `raw`, `age_seconds`,
+`value`, and `valid`. `raw` is the last received display text, including labels
+and fractions, or `None` if unavailable. Its age can be `None` when no receipt
+information is available. Historical raw text does not establish numeric
+validity; `value` is `None` unless `valid` is true. The function only reads the
+supplied reset/step result: it does not poll devices or produce additional steps.
+Only selected parameter feedback is returned; absent feedback yields `{}`.
 
 See [parameter observations](parameter-observations.md) for matching, expiry,
 and setup requirements. Raw cached LCD text is not a substitute for a valid

@@ -112,6 +112,18 @@ def test_batch_activates_track_once_and_turns_multiple_vpots() -> None:
     ]
 
 
+def test_batch_preserves_identified_instrument_view() -> None:
+    output = FakeOutput()
+    bridge = LogicMackieBridge([output], [LogicMackieTrack('synth', 1)])
+    bridge.pool.acquire('synth')
+    bridge.ingest(1, mido.Message('sysex', data=(
+        0, 0, 0x66, 0x14, 0x12, 0, *map(ord, 'Track 1 "Alchemy" Page 1/71'.ljust(56)))))
+    bridge.apply_batch([action('synth', slot=2, steps=3)])
+    assert len(output.messages) == 1
+    assert output.messages[0].type == 'control_change'
+    assert output.messages[0].control == 0x11
+
+
 def test_batch_can_restore_human_track_selection() -> None:
     output = FakeOutput()
     bridge = LogicMackieBridge(
@@ -196,5 +208,16 @@ def test_gym_step_routes_discrete_relative_action_to_track_two() -> None:
         # YAML selections expose addressed readings, not unverified LCD/page caches.
         assert "parameter_readings" in info["snapshot"].diagnostics
         assert "mackie_pages" not in info["snapshot"].diagnostics
+        # Text labels remain observable without a refreshed identity header.
+        backend.inputs[0].callback(mido.Message(
+            'sysex', data=(0, 0, 0x66, 0x14, 0x12, 0, *map(ord, 'Robotc'.ljust(7)))))
+        backend.inputs[0].callback(mido.Message(
+            'sysex', data=(0, 0, 0x66, 0x14, 0x12, 56, *map(ord, 'Off'.ljust(7)))))
+        observation, _, _, _, info = env.step({key: [0., 0., 0.] for key in action_values})
+        reading = info['snapshot'].diagnostics['parameter_readings']['track_1/page_1/slot_1']
+        assert reading['display_raw'] == 'Off'
+        assert not reading['valid']
+        slot = env.registry.parameter_slot('track_1/page_1/slot_1')
+        assert not observation['parameter_valid'][slot]
     finally:
         env.close()

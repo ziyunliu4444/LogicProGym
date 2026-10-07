@@ -52,15 +52,16 @@ def test_shared_feedback_displays_only_returned_reports(capsys):
                    'valid': True, 'age_seconds': .1},
         'res': {'name': 'Res', 'raw': '18 %', 'valid': False},
         'thin': {'name': 'Thin', 'valid': False},
+        'arp': {'name': 'Arp Md', 'display_raw': 'Off', 'display_age_seconds': 1.2,
+                'valid': False},
     }
     snapshot = DawSnapshot(diagnostics={'mackie': {'parameter_readings': readings}})
     logic_shared_track.print_parameter_readings({'snapshot': snapshot})
     output = capsys.readouterr().out
-    assert "reported='41.34 %' valid=True" in output
-    assert "unavailable last_reported='18 %' valid=False" in output
-    assert 'waiting for matched numeric feedback' in output
-    assert '0.4134' not in output
-    assert 'displayed=' not in output
+    assert "raw='41.34 %' age=0.1 value=0.4134 valid=True" in output
+    assert "raw='18 %' age=None value=None valid=False" in output
+    assert "raw=None age=None value=None valid=False" in output
+    assert "raw='Off' age=1.2 value=None valid=False" in output
 
 
 def test_shared_feedback_handles_no_observed_parameters(capsys):

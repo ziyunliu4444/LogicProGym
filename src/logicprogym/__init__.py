@@ -9,6 +9,7 @@ from logicprogym.models import MusicCommand, MusicEvent, MusicWorldSnapshot
 from logicprogym.wrappers import FunctionReward
 from logicprogym.audio import AudioInput, AudioObservation
 from logicprogym.world import MusicWorldDescription
+from logicprogym.readings import ParameterReading, parameter_readings
 
 ENV_ID = "LogicProGym/Logic-v0"
 if ENV_ID not in gym_registry:
@@ -29,4 +30,6 @@ __all__ = [
     "MusicWorldSnapshot",
     "StandaloneBackend",
     "make",
+    "ParameterReading",
+    "parameter_readings",
 ]

@@ -13,6 +13,7 @@ from contextlib import ExitStack
 from pathlib import Path
 from time import sleep
 from typing import Any, Callable, Sequence
+import logging
 
 import mido
 import yaml
@@ -21,6 +22,8 @@ from logicprogym.adapters.mackie import (
     MackieLcd,
     button_messages,
     instrument_page,
+    instrument_header,
+    parse_lcd_update,
     track_select_messages,
     vpot_message,
 )
@@ -228,6 +231,15 @@ class LogicMackieBridge:
     def _activation_messages(self, track: LogicMackieTrack) -> list[mido.Message]:
         """Build selection plus Instrument Edit restoration for one track."""
 
+        controller = next((item for item in self.pool.controllers
+                           if item.track_id == track.id), None)
+        if controller is not None and self.restore_logic_track in (None, track.logic_track):
+            header = instrument_header(controller.lcd)
+            if (header is not None and header.get('page') is not None
+                    and header['track'] == track.logic_track):
+                # Instrument is modal: leave an already identified parameter
+                # view in place instead of pressing its button on every step.
+                return []
         messages = list(track_select_messages(track.logic_track - 1))
         for _ in range(self.instrument_presses):
             messages.extend(button_messages("instrument"))
@@ -320,6 +332,11 @@ class LogicMackieBridge:
             raise ValueError("Unknown Mackie controller number")
         controller = self.pool.controllers[controller_number - 1]
         changed = controller.lcd.consume(message)
+        update = parse_lcd_update(message)
+        if update is not None:
+            logging.getLogger(__name__).debug(
+                'LCD controller=%s offset=%s text=%r rows=%r',
+                controller_number, update[0], update[1], controller.lcd.rows)
         self.feedback.ingest(controller_number, controller.lcd, message)
         if not changed or controller.track_id is None:
             return changed
@@ -596,7 +613,7 @@ class LogicMackieAdapter(LogicProAdapter):
     def reset(self) -> None:
         """Do not carry accepted LCD readings across episode boundaries."""
         if self.service.bridge is not None:
-            self.service.bridge.feedback.invalidate()
+            self.service.bridge.feedback.invalidate(clear_raw=True)
 
     def close(self) -> None:
         self.service.close()

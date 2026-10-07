@@ -89,7 +89,9 @@ class ObservationSelection:
                 result['queued_events'] = len(events)
             if 'parameter_readings' in raw:
                 allowed_fields = {'name', 'valid', 'age_seconds', 'raw', 'value',
-                                  'received_at', 'unit', 'controller', 'track', 'page', 'slot'}
+                                  'received_at', 'unit', 'controller', 'track', 'page', 'slot',
+                                  'display_name', 'display_raw', 'display_received_at',
+                                  'display_age_seconds'}
                 result['parameter_readings'] = {
                     key: {field: deepcopy(value) for field, value in reading.items()
                           if field in allowed_fields}

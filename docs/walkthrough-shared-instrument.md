@@ -78,6 +78,11 @@ The same call returns numerical `observation['parameter_values']` and
 `observation['parameter_valid']` for policies that need instrument feedback.
 The example does not poll the Mackie adapter or inspect internal LCD objects.
 
+The terminal prefers raw LCD text (`display_raw`), including labels and fractions,
+when the configured slot name matches. This cached text does not require matched
+numeric feedback and does not establish track/page identity or freshness.
+Numerical observations still use `parameter_valid` independently.
+
 Percentages are Logic's reported text, not estimated positions. Each step
 prints only the feedback available at that point. Asynchronous reports may
 arrive on a later step, and Logic may not report all eight values together.
@@ -92,9 +97,11 @@ python examples/logic_shared_track.py configs/my_shared_track.yaml --read-only -
 
 Keep `plugin_parameters` in the shared track's `observe` list. Open Alchemy and
 move Cutoff manually. `KNOB` lines show the reported display text, validity, and
-age. `waiting` means no matched numeric reading; `unavailable last_reported`
-is not a confirmed current value. Enumeration labels and fractions such as
-arpeggiator modes/rates are not currently exposed by the numeric feedback parser.
+age when available. The terminal uses `logicprogym.parameter_readings(info)`
+and prints `raw`, `age`, `value`, and `valid`. `raw=None` means no display value
+has been received. `value=None` means there is no accepted numeric reading,
+even when raw text is present. Enumeration labels and fractions remain available
+as raw text.
 Logic must send matching track/page/parameter feedback; a mouse movement is not
 guaranteed to produce it. Read-only sends zero parameter movements and no notes,
 but establishing the Mackie connection can select tracks and Instrument views.

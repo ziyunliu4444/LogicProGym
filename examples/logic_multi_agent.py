@@ -64,12 +64,10 @@ def main():
             for event in snapshot.events:
                 if event.track_id == 'human':
                     print(f'HUMAN {event.kind} {event.values}', flush=True)
-            display = snapshot.diagnostics.get('mackie', {}).get('mackie_displays', {}).get('synth')
-            for key, reading in snapshot.diagnostics.get('mackie', {}).get('parameter_readings', {}).items():
-                value = reading.get('raw', 'unavailable') if reading['valid'] else 'unavailable'
-                print(f"Logic {key}: {value}; valid={reading['valid']}; age={reading['age_seconds']}", flush=True)
-            if display:
-                print(f'Synth LCD cached slot 2: {display[1]!r}', flush=True)
+            for reading in logicprogym.parameter_readings(info).values():
+                print(f'Logic {reading.name}: raw={reading.raw!r}; '
+                      f'value={reading.value}; valid={reading.valid}; '
+                      f'age={reading.age_seconds}', flush=True)
             step += 1
             if terminated or truncated:
                 break

@@ -20,6 +20,61 @@ def fixture():
     return tracker, clock, update
 
 
+def test_raw_feedback_survives_display_replacement_and_actions_but_not_reset():
+    tracker, clock, update = fixture()
+    update(7, 'Cutoff ')
+    update(63, '41.3')
+    update(67, '4 %')
+    clock[0] = 1
+    update(0, 'Track 2 "Synth" "Alchemy" Page 1/71'.ljust(56))
+    update(56, 'Robotc Cutoff '.ljust(56))
+    tracker.invalidate()  # A new action must not erase historical raw text.
+    clock[0] = 4
+    values, details = tracker.snapshot()
+    assert values == {}
+    assert details['cutoff']['display_raw'] == '41.34 %'
+    assert details['cutoff']['display_age_seconds'] == 4
+    assert not details['cutoff']['valid']
+    update(7, 'Cutoff ')  # Name update alone must not refresh old lower text.
+    assert tracker.snapshot()[1]['cutoff']['display_age_seconds'] == 4
+    update(63, '1/16   ')
+    assert tracker.snapshot()[1]['cutoff']['display_raw'] == '1/16'
+    assert tracker.snapshot()[1]['cutoff']['display_age_seconds'] == 0
+    assert tracker.snapshot()[0] == {}
+    tracker.invalidate(clear_raw=True)
+    assert 'display_raw' not in tracker.snapshot()[1]['cutoff']
+
+
+
+def test_overview_slot_supports_different_value_label_and_clears_on_page_change():
+    tracker = MackieFeedback([dict(id='robot', name='Robotc', controller=1,
+                                  track=1, page=1, slot=1)])
+    lcd = MackieLcd()
+
+    def update(offset, text):
+        message = mido.Message('sysex', data=[0, 0, 102, 20, 18, offset, *map(ord, text)])
+        lcd.consume(message)
+        tracker.ingest(1, lcd, message)
+
+    update(0, 'Track 1 "8-Bit Memories" "Alchemy Stereo" Page 1/71'.ljust(56))
+    update(56, 'Robotc Cutoff Arp Md Thin   Porto  Res    ArpRat ArpOct ')
+    assert 'display_raw' not in tracker.snapshot()[1]['robot']
+    tracker.invalidate()  # Actions invalidate numeric checks, not learned raw slots.
+    update(0, 'Robotic')
+    update(56, '19.51 %')
+    values, readings = tracker.snapshot()
+    assert readings['robot']['display_raw'] == '19.51 %'
+    assert readings['robot']['display_name'] == 'Robotic'
+    assert not readings['robot']['valid']
+    assert values == {}
+    update(0, 'Track 1 "8-Bit Memories" "Alchemy Stereo" Page 2/71'.ljust(56))
+    update(0, 'Another')
+    update(56, '90.00 %')
+    assert tracker.snapshot()[1]['robot']['display_raw'] == '19.51 %'
+    tracker.invalidate(clear_raw=True)
+    assert not tracker.raw_slots
+
+
 def test_fragment_identity_age_and_invalidation():
     tracker, clock, update = fixture()
     update(0, 'Track 2 "Synth" "Alchemy" Page 1/71'.ljust(56))
