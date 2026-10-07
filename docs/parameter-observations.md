@@ -14,13 +14,24 @@ Percentages are divided by 100 (`41.34 %` becomes `0.4134`). Bare numbers retain
 their displayed units. Labels, fractions such as `1/16`, and other unit strings
 are currently unavailable as numeric observations. User rewards are unchanged.
 
-The parser requires an observed track/page header, the configured parameter
-name in its slot, and complete refreshed name and value cells. Readings expire
-after two seconds. Sending a Mackie action clears the observation context until
-another header is received. A valid reading means a recent, matched display
-reading; MCU provides no command acknowledgement, so it does not prove that a
-particular action caused the value. Delayed or incomplete updates can result in
-unavailable observations even while the knob visibly moves.
+The numeric parser accepts two ways to establish parameter identity:
+
+- A matching observed track/page header plus complete refreshed name/value cells.
+- A matching track/page overview with the configured name in the slot's lower
+  cell. Once identified, that slot accepts a complete refreshed numeric value
+  even if Logic expands its transient label (for example, `Robotc` → `Robotic`).
+  After a complete numeric cell is received, changed-character updates can
+  reuse its unchanged characters for that same identified slot. Name-only
+  updates neither erase a reading nor refresh its receipt time.
+
+Readings expire after two seconds. Sending a Mackie action clears numeric
+readings and partial value fragments; an established overview slot can accept
+new complete values without another header. A different observed track/page
+clears those slot associations and numeric cell baselines, and environment reset
+clears all feedback. Nonnumeric replacement text also clears the numeric baseline.
+Text labels and fractions remain raw text with numeric validity false. A valid
+reading means recent display feedback; MCU provides no command acknowledgement,
+so it does not prove that a particular action caused the value.
 
 Configure a parameter's `id` and exact displayed `name` in the Mackie controller
 catalog. Standard IDs such as `synth/page_1/slot_2` provide its address. For custom
@@ -55,8 +66,8 @@ readings for human inspection. See [observation selection](yaml-configuration.md
 For a configured slot, `parameter_readings` also
 includes `display_name` and `display_raw`: the last received LCD text, including labels
 and fractions. These fields do not require numeric parsing or a refreshed
-track/page header. They do not establish freshness or numeric validity and never
-populate `parameter_values`. Readings are captured on incoming value-cell updates,
+track/page header. Raw text alone does not establish numeric validity. Only complete numeric
+updates accepted by the identity and age checks populate `parameter_values`. Readings are captured on incoming value-cell updates,
 using either the matching displayed name or a slot previously identified from
 the configured name on the overview's lower row under a matching track/page
 header. This supports Logic changing labels such as `Robotc` to `Robotic` while

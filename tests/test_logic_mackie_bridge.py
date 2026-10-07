@@ -208,6 +208,26 @@ def test_gym_step_routes_discrete_relative_action_to_track_two() -> None:
         # YAML selections expose addressed readings, not unverified LCD/page caches.
         assert "parameter_readings" in info["snapshot"].diagnostics
         assert "mackie_pages" not in info["snapshot"].diagnostics
+        # The overview's slot name remains the identity when Logic expands it
+        # in its transient value display. Numeric observations and public
+        # readings must agree after action-time invalidation.
+        for offset, text in (
+            (0, 'Track 1 "Alchemy" Page 1/71'.ljust(56)),
+            (56, 'Robotc '.ljust(56)),
+        ):
+            backend.inputs[0].callback(mido.Message('sysex', data=(
+                0, 0, 0x66, 0x14, 0x12, offset, *map(ord, text))))
+        adapter.service.bridge.feedback.invalidate()
+        for offset, text in ((0, 'Robotic'), (56, '19.51 %')):
+            backend.inputs[0].callback(mido.Message('sysex', data=(
+                0, 0, 0x66, 0x14, 0x12, offset, *map(ord, text))))
+        observation, _, _, _, info = env.step({key: [0., 0., 0.] for key in action_values})
+        slot = env.registry.parameter_slot('track_1/page_1/slot_1')
+        assert observation['parameter_valid'][slot] == 1
+        assert observation['parameter_values'][slot] == pytest.approx(.1951)
+        from logicprogym import parameter_readings
+        reading = parameter_readings(info)['track_1/page_1/slot_1']
+        assert reading.valid and reading.value == pytest.approx(.1951)
         # Text labels remain observable without a refreshed identity header.
         backend.inputs[0].callback(mido.Message(
             'sysex', data=(0, 0, 0x66, 0x14, 0x12, 0, *map(ord, 'Robotc'.ljust(7)))))

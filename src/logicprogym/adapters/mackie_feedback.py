@@ -8,7 +8,7 @@ from logicprogym.adapters.mackie import instrument_header, parse_lcd_update
 
 
 class MackieFeedback:
-    """Accept complete refreshed name/value cells under an observed track header.
+    """Accept complete numeric cells using header/name or identified overview slots.
 
     MCU carries no command acknowledgements. These checks establish display
     identity and age, not a causal acknowledgement of a particular action.
@@ -24,10 +24,11 @@ class MackieFeedback:
         self.raw_readings = {}
         self.raw_context = {}
         self.raw_slots = set()
+        self.numeric_baselines = {}
         self.lock = RLock()
 
     def invalidate(self, *, clear_raw=False):
-        """Require a new observed header after selection or parameter commands."""
+        """Clear numeric readings/fragments; reset also clears learned raw slot identity."""
         with self.lock:
             self.context.clear()
             self.touched.clear()
@@ -36,6 +37,7 @@ class MackieFeedback:
                 self.raw_readings.clear()
                 self.raw_context.clear()
                 self.raw_slots.clear()
+                self.numeric_baselines.clear()
 
     def ingest(self, number, lcd, message):
         update = parse_lcd_update(message)
@@ -53,6 +55,9 @@ class MackieFeedback:
                 if self.raw_context.get(number) != address:
                     self.raw_slots.difference_update(
                         b['id'] for b in self.bindings if b['controller'] == number)
+                    for binding in self.bindings:
+                        if binding['controller'] == number:
+                            self.numeric_baselines.pop(binding['id'], None)
                 self.raw_context[number] = address
                 # Logic's overview puts slot names on the LOWER row. After a
                 # turn it may use a different label above (Robotc -> Robotic).
@@ -82,7 +87,10 @@ class MackieFeedback:
                 start = (binding['slot'] - 1) * 7
                 cells = set(range(start, start + 7)) | set(range(56 + start, 63 + start))
                 if binding['controller'] == number and cells & updated:
-                    self.readings.pop(binding['id'], None)
+                    addressed = (binding['id'] in self.raw_slots and
+                                 self.raw_context.get(number) == (binding['track'], binding['page']))
+                    if not addressed or set(range(56 + start, 63 + start)) & updated:
+                        self.readings.pop(binding['id'], None)
             header = instrument_header(lcd)
             if header and header.get('page') is not None and set(range(56)) <= touched:
                 context = (header['track'], header['page'][0])
@@ -98,18 +106,28 @@ class MackieFeedback:
                 touched.clear()
                 return
             context = self.context.get(number)
-            if context is None:
-                return
             for binding in self.bindings:
+                address = (binding['track'], binding['page'])
+                addressed = (binding['id'] in self.raw_slots
+                             and self.raw_context.get(number) == address)
                 if (binding['controller'] != number or
-                        context != (binding['track'], binding['page'])):
+                        (context != address and not addressed)):
                     continue
                 start = (binding['slot'] - 1) * 7
-                required = set(range(start, start + 7)) | set(range(56 + start, 63 + start))
-                if not required <= touched:
+                required = set(range(56 + start, 63 + start))
+                if addressed and not required & updated:
+                    continue  # A name-only update is not a new value reading.
+                if not addressed:
+                    required |= set(range(start, start + 7))
+                cell = lcd.rows[1][start:start + 7]
+                baseline = self.numeric_baselines.get(binding['id']) if addressed else None
+                complete_delta = baseline is not None and all(
+                    56 + start + index in updated or char == baseline[index]
+                    for index, char in enumerate(cell))
+                if not required <= touched and not complete_delta:
                     continue
                 name, raw = lcd.strips[binding['slot'] - 1]
-                if name.casefold() != binding['name'].casefold():
+                if not addressed and name.casefold() != binding['name'].casefold():
                     self.readings.pop(binding['id'], None)
                     continue
                 # Percentages have a defined normalized range. Bare numbers
@@ -117,15 +135,18 @@ class MackieFeedback:
                 match = re.fullmatch(r'([+-]?\d+(?:\.\d+)?)\s*(%)?', raw.strip())
                 if match is None:
                     self.readings.pop(binding['id'], None)
+                    self.numeric_baselines.pop(binding['id'], None)
                     continue
                 value = float(match[1]) / (100 if match[2] else 1)
                 if abs(value) > 3.4e38:
                     continue
                 self.readings[binding['id']] = dict(
-                    name=name, raw=raw, value=value, received_at=now,
+                    name=binding['name'], raw=raw, value=value, received_at=now,
                     unit='normalized_percent' if match[2] else 'display_number',
                     controller=number, track=binding['track'], page=binding['page'],
-                    slot=binding['slot'])
+                    slot=binding['slot'], _overview_identity=addressed)
+                if addressed:
+                    self.numeric_baselines[binding['id']] = cell
                 touched.difference_update(required)
 
     def snapshot(self):
@@ -143,7 +164,13 @@ class MackieFeedback:
                         0.0, now - raw_reading['display_received_at']))
                 if reading:
                     age = max(0.0, now - reading['received_at'])
-                    valid = age <= self.max_age and self.context.get(reading['controller']) == (reading['track'], reading['page'])
+                    if reading.get('_overview_identity'):
+                        identity_valid = (binding['id'] in self.raw_slots and
+                            self.raw_context.get(reading['controller']) ==
+                            (reading['track'], reading['page']))
+                    else:
+                        identity_valid = self.context.get(reading['controller']) == (reading['track'], reading['page'])
+                    valid = age <= self.max_age and identity_valid
                     detail.update(reading, age_seconds=age, valid=valid)
                     if valid:
                         values[binding['id']] = reading['value']
