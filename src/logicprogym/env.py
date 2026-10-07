@@ -7,6 +7,9 @@ from collections.abc import Callable, Mapping, Sequence
 import gymnasium as gym
 import numpy as np
 import threading
+import signal
+from contextlib import contextmanager
+from functools import wraps
 
 from logicprogym.actions.processor import ActionProcessor
 from logicprogym.actions.specs import ActionSpec
@@ -17,6 +20,31 @@ from logicprogym.observation_selection import ObservationSelection
 from logicprogym.registry import SessionRegistry
 from logicprogym.spaces import build_action_space, build_observation_space
 from logicprogym.validation import validate_capabilities
+
+
+@contextmanager
+def _protect_cleanup():
+    """Defer repeated terminal interrupts only while closing, then restore state."""
+    main_thread = threading.current_thread() is threading.main_thread()
+    previous = signal.getsignal(signal.SIGINT) if main_thread else None
+    if main_thread:
+        signal.signal(signal.SIGINT, signal.SIG_IGN)
+    try:
+        yield
+    finally:
+        if main_thread:
+            signal.signal(signal.SIGINT, previous)
+
+
+def _close_on_interrupt(method):
+    @wraps(method)
+    def call(self, *args, **kwargs):
+        try:
+            return method(self, *args, **kwargs)
+        except KeyboardInterrupt:
+            self.close()
+            raise
+    return call
 
 
 # Rewards belong to research tasks, not DAW adapters. This callback keeps that
@@ -78,6 +106,7 @@ class LogicProEnv(gym.Env):
         )
         self.frame_clock = None
         self._connected = False
+        self._connecting = False
         self._cleanup_thread = None
         self._cleanup_errors = []
 
@@ -119,6 +148,7 @@ class LogicProEnv(gym.Env):
             return snapshot
         return self.observation_selection.snapshot(snapshot, self.registry)
 
+    @_close_on_interrupt
     def reset(self, *, seed=None, options=None):
         """Connect lazily and return the latest DAW snapshot."""
 
@@ -129,7 +159,10 @@ class LogicProEnv(gym.Env):
                 raise RuntimeError("Previous DAW cleanup failed") from self._cleanup_errors[0]
         super().reset(seed=seed)
         if not self._connected:
+            self._connecting = True
             self.backend.connect()
+            self._connected = True
+            self._connecting = False
             world = self.backend.discover_world()
             self.registry.bind(world.tracks, world.parameters)
             self._connected = True
@@ -152,6 +185,7 @@ class LogicProEnv(gym.Env):
                     {"track": c.track_id, "target": c.kind, "value": c.values["value"]}
                     for c in self._reset_commands]}}
 
+    @_close_on_interrupt
     def step(self, action):
         """Compile one policy action, send it, then observe the resulting state."""
 
@@ -171,6 +205,11 @@ class LogicProEnv(gym.Env):
         return self._observation(snapshot), float(reward), False, False, {"snapshot": snapshot, **({"frame": frame} if frame is not None else {})}
 
     def close(self, timeout: float = 3.0) -> None:
+        """Release notes/ports, protecting cleanup from repeated Ctrl-C."""
+        with _protect_cleanup():
+            self._close(timeout)
+
+    def _close(self, timeout: float) -> None:
         """Release notes and ports, reporting stalled cleanup without exiting Python.
 
         A timed-out native close cannot safely be killed by Python. Keep its
@@ -179,9 +218,10 @@ class LogicProEnv(gym.Env):
         """
         if timeout <= 0:
             raise ValueError("close timeout must be positive")
-        if self._connected:
+        if self._connected or self._connecting:
+            commands = self.action_processor.emergency_stop() if self._connected else []
             self._connected = False
-            commands = self.action_processor.emergency_stop()
+            self._connecting = False
             self._cleanup_errors = []
 
             def cleanup():

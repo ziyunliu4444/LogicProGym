@@ -67,4 +67,4 @@ initial plug-in state is not implemented.
 
 For held-note, sustain and pitch-bend tests, configure their reset values as
 above and run `python live_tests/logic_reset_test.py YOUR_SESSION.yaml`.
-Both reset CLIs use the supervisor described in [shutdown](shutdown.md).
+Both reset CLIs call the core cleanup described in [shutdown](shutdown.md).

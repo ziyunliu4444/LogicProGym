@@ -251,7 +251,7 @@ class LogicMidiAdapter(LogicProAdapter):
                     )
                 if route.output_port:
                     self._outputs[route.track_id] = backend.open_output(route.output_port)
-        except Exception:
+        except BaseException:
             self.close()
             raise
         self._connected = True

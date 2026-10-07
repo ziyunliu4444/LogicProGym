@@ -73,16 +73,16 @@ selected catalog entries without copying names, see the
 
 ## Play
 
-The normal run automatically prints `KNOB` readings after the agent moves.
-It collects feedback for up to 0.3 seconds before the next action, without extra
-knob movements. Percentages are Logic's reported text, not estimated positions.
-Only parameters for which matched numeric feedback arrives can be shown; Logic
-does not necessarily report all eight values together. Readings describe recent
-reports, not acknowledgements of individual movements.
+The normal run prints `KNOB` readings from the `info` returned by `env.step()`.
+The same call returns numerical `observation['parameter_values']` and
+`observation['parameter_valid']` for policies that need instrument feedback.
+The example does not poll the Mackie adapter or inspect internal LCD objects.
 
-`displayed=... unverified track/page` is a terminal-only fallback when the LCD
-shows a matching name and number but identity is unconfirmed. Its freshness is
-unknown; it is not promoted into confirmed Gymnasium observations or rewards.
+Percentages are Logic's reported text, not estimated positions. Each step
+prints only the feedback available at that point. Asynchronous reports may
+arrive on a later step, and Logic may not report all eight values together.
+Validity and age describe the returned reports, not acknowledgements of
+individual movements or a guarantee of current knob positions.
 
 Optional: to inspect feedback without scripted knob movement:
 

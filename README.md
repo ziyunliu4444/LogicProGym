@@ -130,6 +130,9 @@ Sampling actions can produce notes and change controls. Replace sampling with
 your own policy and reward when training; use the documented examples for a
 bounded interactive run.
 
+See the [observation guide](docs/observations.md) for available fields, shapes,
+validity masks, and examples of reading notes, controls, parameters, and audio.
+
 ## Limitations and release status
 
 For opt-in step timing, observation freshness, and saving experiment metadata,

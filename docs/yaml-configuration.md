@@ -233,6 +233,9 @@ Mackie controller operation remains experimental.
 
 ### Tracks and observations
 
+For field shapes, masks, and Python examples, see the
+[observation guide](observations.md).
+
 | Field | Meaning |
 | --- | --- |
 | `alias` | Required unique role name, matched to transport IDs |

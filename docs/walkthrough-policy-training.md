@@ -57,7 +57,8 @@ Steps include a 0.25-second pause plus communication overhead.
 The run stops after 100 steps; Ctrl-C stops early. Training saves policy weights,
 optimizer state, baseline, cumulative step count, and Torch random state before
 cleanup. Look for `Saved artifacts/pitch_walkthrough.pt` and shutdown output.
-The CLI supervises cleanup; forced termination still cannot confirm MIDI release.
+LogicProGym handles shutdown note release; a cleanup timeout does not confirm
+that Logic received those messages.
 
 Continue for 100 **additional** steps using the same configuration:
 

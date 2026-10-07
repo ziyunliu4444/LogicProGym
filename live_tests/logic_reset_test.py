@@ -13,11 +13,6 @@ import numpy as np
 import yaml
 import logicprogym
 
-try:
-    from ._cli_shutdown import supervise
-except ImportError:
-    from _cli_shutdown import supervise
-
 
 def make_action(space, track, note):
     """Build a neutral action for the expressive-instrument configuration."""
@@ -94,12 +89,5 @@ def main(on_cleanup=None):
         print('Environment closed.', flush=True)
 
 
-def _reset_worker(connection):
-    try:
-        main(on_cleanup=lambda: connection.send('cleanup'))
-    finally:
-        connection.close()
-
-
 if __name__ == '__main__':
-    raise SystemExit(supervise(worker_target=_reset_worker))
+    main()

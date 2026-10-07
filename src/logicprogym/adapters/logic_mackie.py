@@ -391,7 +391,7 @@ class LogicMackieService:
                 stack.enter_context(
                     self.midi_backend.open_input(name, virtual=True, callback=callback)
                 )
-        except Exception:
+        except BaseException:
             stack.close()
             raise
         self.bridge = bridge

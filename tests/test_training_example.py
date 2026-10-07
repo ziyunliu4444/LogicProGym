@@ -3,28 +3,8 @@
 import gymnasium as gym
 import numpy as np
 import torch
-import time
 
 from examples import logic_train_policy as example
-
-
-def _stalled_cleanup(connection):
-    connection.send('cleanup')
-    time.sleep(60)
-
-
-def _normal_cleanup(connection):
-    connection.send('cleanup')
-    connection.close()
-
-
-def test_supervisor_stops_stalled_cleanup(capsys):
-    assert example.supervise(_stalled_cleanup, cleanup_timeout=.2) == 124
-    assert 'Note release is not confirmed' in capsys.readouterr().out
-
-
-def test_supervisor_allows_normal_exit():
-    assert example.supervise(_normal_cleanup) == 0
 
 
 def test_training_checkpoint_resume_and_evaluation(tmp_path, monkeypatch):

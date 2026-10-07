@@ -63,9 +63,10 @@ See [observation selection](yaml-configuration.md#tracks-and-observations).
 The low-level Python constructor keeps unfiltered compatibility behavior unless
 `track_observations` is supplied.
 
-`close()` attempts agent note cleanup and backend closure. Native calls can
-stall. The training and reset CLI supervisor bounds worker shutdown separately;
-it is not part of the environment API and does not guarantee hardware note release.
+`close()` owns agent note cleanup and backend closure. An interrupted `reset()`
+or `step()` attempts cleanup before propagating Ctrl-C; repeated interrupts
+cannot cut short the main-thread close attempt. Native stalls remain reported
+as failures rather than confirmed hardware note release.
 
 ## Units and validity that contributors must preserve
 
@@ -89,8 +90,8 @@ Public musical demonstrations live in `examples/`, setup helpers in `tools/`,
 and manual hardware checks in `live_tests/`. Automated tests remain in `tests/`.
 Examples show environment construction, `reset()`, `step()` and `close()`
 directly in their own scripts. Policies and action construction are example code.
-Private `_cli_shutdown.py` utilities guard live CLI processes against native
-shutdown hangs; they contain no musical interaction loops.
+Examples use `try/finally` for lifecycle cleanup; shutdown note handling belongs
+to the core environment.
 
 - **Existing MIDI control:** start with YAML. A new mapping often needs no Python.
 - **New action encoding:** update the action specification/compiler, stateful

@@ -1,12 +1,11 @@
 # Checkpoints and resume
 
-The `logic_train_policy.py` command saves before closing MIDI ports. Its CLI
-supervisor allows ten seconds for cleanup, then stops a stuck worker with exit
-code 124 and a warning. This bounds native CoreMIDI shutdown hangs; it does not
-confirm that Logic received note-off messages. If sound remains, stop it in
-Logic. Look for `Saved ...` to confirm persistence. Normal cleanup exits normally.
-The supervisor is specific to this CLI example; it does not forcibly exit code
-using the Gymnasium environment directly.
+The `logic_train_policy.py` command saves before calling the environment’s
+`close()`. LogicProGym handles note release and port cleanup, including Ctrl-C
+inside environment operations. Examples use `finally` for interrupts between
+operations. Look for `Saved ...` to confirm persistence and `Environment closed.`
+to confirm that cleanup returned successfully. A native MIDI timeout is a
+failure, not confirmed hardware note release; see [shutdown](shutdown.md).
 
 The training examples save weights, optimizer state, random-generator
 state, and the parsed session YAML in their checkpoints. They also record the

@@ -16,11 +16,6 @@ import torch
 import logicprogym
 from logicprogym.tasks import PitchCutoffTask
 from logicprogym.checkpoints import session_metadata, validate_session
-try:  # Support both module imports and direct script execution.
-    from ._cli_shutdown import supervise
-except ImportError:
-    from _cli_shutdown import supervise
-
 
 
 def make_action(space, track, note):
@@ -143,15 +138,5 @@ def main(on_cleanup=None):
             print('Environment closed.', flush=True)
 
 
-def _training_worker(connection):
-    """Run normally; notify the supervisor before potentially blocking cleanup."""
-    try:
-        main(on_cleanup=lambda: connection.send('cleanup'))
-    finally:
-        connection.close()
-
-
-
-
 if __name__ == '__main__':
-    raise SystemExit(supervise(_training_worker))
+    main()

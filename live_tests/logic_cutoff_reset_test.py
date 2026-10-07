@@ -10,11 +10,6 @@ import gymnasium as gym
 import logicprogym
 from logicprogym.config import LogicProGymConfig
 
-try:
-    from ._cli_shutdown import supervise
-except ImportError:
-    from _cli_shutdown import supervise
-
 
 def main(on_cleanup=None):
     parser = argparse.ArgumentParser(description=__doc__)
@@ -55,12 +50,5 @@ def main(on_cleanup=None):
         print('Environment closed.', flush=True)
 
 
-def _worker(connection):
-    try:
-        main(on_cleanup=lambda: connection.send('cleanup'))
-    finally:
-        connection.close()
-
-
 if __name__ == '__main__':
-    raise SystemExit(supervise(worker_target=_worker))
+    main()

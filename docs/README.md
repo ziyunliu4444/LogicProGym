@@ -12,6 +12,7 @@ active virtual environment. Personal `configs/my_*.yaml` files are not bundled.
 | Find devices, inspect/scan knobs, or learn MIDI assignments | [Setup tools](../tools/README.md) |
 | Run a musical demonstration or learning policy | [Example catalogue and walkthroughs](../examples/README.md) |
 | Define your own tracks, actions, and observations | [YAML tutorial and reference](yaml-configuration.md) |
+| Read MIDI, parameter, and audio observations in your policy | [Observation guide](observations.md) |
 | Verify audio, reset, routing, or shutdown on your machine | [Live checks](../live_tests/README.md) |
 
 ## Troubleshooting

@@ -10,11 +10,6 @@ import numpy as np
 import argparse
 import gymnasium as gym
 import logicprogym
-try:  # Support both module imports and direct script execution.
-    from ._cli_shutdown import supervise
-except ImportError:
-    from _cli_shutdown import supervise
-
 
 NOTES = (48, 52, 55, 60)
 
@@ -88,12 +83,5 @@ def main(on_cleanup=None):
         env.close()
         print('Environment closed.', flush=True)
 
-def _worker(connection):
-    try:
-        main(on_cleanup=lambda: connection.send('cleanup'))
-    finally:
-        connection.close()
-
-
 if __name__ == '__main__':
-    raise SystemExit(supervise(_worker))
+    main()
