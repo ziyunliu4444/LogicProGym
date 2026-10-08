@@ -1,5 +1,7 @@
 # LogicProGym
 
+[![Discord](https://img.shields.io/badge/Discord-Join%20the%20community-5865F2?logo=discord&logoColor=white)](https://discord.gg/DsTpCDrPyq)
+
 A Gymnasium interface for learning agents that make music alongside humans in
 Logic Pro. Configure what each track can observe and control, then use standard
 Gymnasium `reset()`, `step()`, action spaces and wrappers.
@@ -188,6 +190,9 @@ Late-Breaking Demo (LBD) extended abstract:
 | `protocol/` | Bridge message specification |
 
 ### Contributing
+
+Join our [Discord community](https://discord.gg/DsTpCDrPyq) if you have questions,
+want to share ideas, or would like to collaborate on LogicProGym.
 
 ```bash
 python -m pip install -e '.[test]'
