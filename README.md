@@ -191,9 +191,6 @@ Late-Breaking Demo (LBD) extended abstract:
 
 ### Contributing
 
-Join our [Discord community](https://discord.gg/DsTpCDrPyq) if you have questions,
-want to share ideas, or would like to collaborate on LogicProGym.
-
 ```bash
 python -m pip install -e '.[test]'
 python -m pytest -q
@@ -206,3 +203,6 @@ you do not need a live Logic setup for every contribution.
 
 Only developer test tools are an extra; see the
 [support scope](docs/release-status.md) before starting a live experiment.
+
+Join our [Discord community](https://discord.gg/DsTpCDrPyq) if you have questions,
+want to share ideas, or would like to collaborate on LogicProGym!
