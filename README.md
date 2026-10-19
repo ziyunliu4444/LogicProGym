@@ -188,7 +188,7 @@ Late-Breaking Demo (LBD) extended abstract:
 | `live_tests/` | Manual checks requiring your Logic setup |
 | `tests/` | Device-free automated tests and their fixtures |
 | `docs/` | Setup, walkthroughs, reference, and contributor guides |
-| `protocol/` | Bridge message specification |
+| `protocol/` | Draft plug-in bridge protocol for future extensions, not required for Logic setup |
 
 ### Contributing
 

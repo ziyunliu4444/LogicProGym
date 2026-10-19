@@ -1,4 +1,4 @@
-# Reconnecting control surfaces and audio
+# Reconnect MIDI routes, Mackie endpoints, and native audio
 
 Use this guide when virtual endpoints change or Logic displays stale control-surface
 state. It is not necessary to delete all controller assignments.
@@ -37,4 +37,4 @@ identity change may require recording permission again. Follow the
 
 Keep a copy of your Logic project and YAML before changing routes or presets.
 Checkpoint resume validates the session configuration but does not restore
-Logic state. See [checkpoint guidance](checkpoints-and-release.md).
+Logic state. See [checkpoint guidance](checkpoints.md).

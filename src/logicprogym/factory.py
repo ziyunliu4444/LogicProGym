@@ -65,11 +65,6 @@ def make(
         if frames.get('enabled', False):
             frame_clock = FrameClock(frames.get('duration_seconds', .05))
             env.frame_clock = frame_clock
-            if not env.action_specs:
-                # Gymnasium rejects empty Dict spaces. Observation-only frames
-                # expose one explicit no-op action instead.
-                import gymnasium as gym
-                env.action_space = gym.spaces.Discrete(1)
             midi = getattr(env.adapter, 'midi', env.adapter)
             if hasattr(midi, 'enable_frames'):
                 midi.enable_frames(env.event_capacity * 16)

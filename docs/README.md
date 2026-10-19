@@ -31,12 +31,12 @@ active virtual environment. Personal `configs/my_*.yaml` files are not bundled.
 - [Frame-wise MIDI and audio](frame-observations.md)
 - [Opt-in control resets](reset-controls.md)
 - [Timing, freshness, and run manifests](experiment-reproducibility.md)
-- [Checkpoints and resume](checkpoints-and-release.md)
+- [Checkpoints and resume](checkpoints.md)
 - [Full live acceptance checklist](logic-1.0-acceptance.md)
 
 ## Contributors and maintainers
 
 - [Contribution guide](../CONTRIBUTING.md)
 - [Architecture and extension points](architecture.md)
-- [Bridge protocol](../protocol/spec-v1.md)
+- [Draft plug-in bridge protocol (extension design)](../protocol/spec-v1.md)
 - [Release packaging checks](final-check.md)

@@ -1,6 +1,13 @@
-# LogicProGym Bridge Protocol v1
+# Draft plug-in bridge protocol v1 (extension design)
 
 Status: draft implementation contract
+
+This document specifies an extension architecture, not the connection used by
+the released Logic Pro integration. Version 1.0 connects through MIDI/Mackie
+adapters and a separate native audio helper; users do not install a bridge
+plug-in or start a TCP server. Protocol infrastructure does not establish that
+a compatible in-DAW plug-in exists or has been live-validated. For the current
+implementation, see the [architecture guide](../docs/architecture.md).
 
 The protocol connects the Python music-world server to bridge-plugin instances
 running inside DAWs. Audio threads never read, write, parse, or wait on protocol

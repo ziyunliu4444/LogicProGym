@@ -51,7 +51,8 @@ def diagnose(
         Diagnostic(
             "PASS",
             "Gymnasium action space",
-            ", ".join(env.action_space.spaces) or "empty",
+            (", ".join(env.action_space.spaces) if env.unwrapped.action_specs
+             else "Discrete(1): step(0) observes without control actions"),
         ),
         Diagnostic("PASS", "Gymnasium observation space", "valid fixed-shape space"),
     ]

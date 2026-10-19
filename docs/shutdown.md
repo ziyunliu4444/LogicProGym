@@ -1,4 +1,4 @@
-# Public environment shutdown
+# Shutdown, note release, and cleanup limits
 
 LogicProGym owns shutdown note release. If Ctrl-C interrupts `reset()` or
 `step()`, the environment attempts `close()` before re-raising `KeyboardInterrupt`.

@@ -27,6 +27,9 @@ Read these files in this order:
 | Backend contract | `src/logicprogym/backends/base.py`, `adapters/base.py` | Backend-neutral operations and compatibility with adapters |
 | Logic I/O | `src/logicprogym/adapters/logic.py`, `logic_hybrid.py`, `logic_mackie.py` | MIDI routes and Mackie control |
 | Mackie feedback | `src/logicprogym/adapters/mackie_feedback.py` | Validate asynchronous feedback before exposing values |
+| Public parameter readings | `src/logicprogym/readings.py` | Immutable display-text, age and numeric-validity access from returned info |
+| Discovery tools | `src/logicprogym/mackie_inspector.py`, `logic_setup.py`, `cli.py` | Interactive inspection, Instrument navigation, scanning and setup checks |
+| Parameter catalogs | `src/logicprogym/parameter_catalog.py` | Resolve selected catalog entries and generate YAML Mackie actions |
 | Audio/timing | `src/logicprogym/audio.py`, `native_audio.py`, `frames.py`, `timing.py` | Capture, frame assembly and timing diagnostics |
 | Reset policy | `src/logicprogym/reset_controls.py` | Validate explicitly agent-owned absolute baseline commands |
 | Research tasks | `src/logicprogym/tasks/`, `wrappers.py`, `examples/` | Task-specific rewards and policies, separate from transport |

@@ -1,4 +1,4 @@
-# Release status and support scope
+# Version 1.0.0: supported features and limitations
 
 **Version: 1.0.0.** Live behavior depends on your instruments, routing, and
 operating system. Use the [live checklist](logic-1.0-acceptance.md) to validate
@@ -18,6 +18,9 @@ use an extra: `python -m pip install -e '.[test]'`.
 ## Available interfaces
 
 - Per-track MIDI-only, Mackie-only or combined control.
+- All action-free sessions expose `Discrete(1)`; `step(0)` observes without
+  sending control actions. Frame timing is optional; connection/reset may still
+  initialize Mackie views or track selection.
 - Notes, velocity, pitch bend and explicitly mapped MIDI CC actions.
 - Human MIDI input observations, Mackie value diagnostics and optional audio.
 - Per-track observation selection through `observe`; omitted or empty lists
@@ -27,6 +30,11 @@ use an extra: `python -m pip install -e '.[test]'`.
   and [frame observations](frame-observations.md).
 - Gymnasium construction through `gym.make("LogicProGym/Logic-v0", config_path=...)`.
   Connections open on reset; always close the environment after use.
+- [Mackie inspection and discovery](mackie-discovery.md): an interactive console,
+  page scanning, and selected catalog entries referenced from session YAML.
+- Public `logicprogym.parameter_readings(info)` access to selected display text,
+  its age, and independently validated numeric readings. See
+  [parameter feedback](parameter-observations.md).
 
 Task rewards are configurable; the default is zero. Examples demonstrate the
 interface and do not guarantee musical quality or learning convergence.
@@ -43,8 +51,8 @@ Articulation requires an instrument-specific mapping supplied by the researcher.
   active Mackie controller when evaluating a new setup; multiple MIDI tracks
   can still use distinct routes.
 - MIDI messages are serialized, not sample-synchronous across tracks.
-- Frame audio uses receipt-time estimates, not sample-accurate alignment to
-  MIDI or Logic's transport. Frame mode remains opt-in.
+- Frame audio uses a continuous sample-count timeline anchored to receipt time,
+  not sample-accurate alignment to MIDI or Logic's transport. Frame mode remains opt-in.
 - Reset does not reload a Logic project, preset, transport position or checkpoint.
   Optional reset commands are sent without automatic confirmation from Logic.
 - Cleanup after a process crash or SIGKILL cannot be guaranteed.
@@ -53,6 +61,8 @@ Articulation requires an instrument-specific mapping supplied by the researcher.
 
 Use the [live checklist](logic-1.0-acceptance.md) to validate your setup.
 Maintainers can use the [release checks](final-check.md) to validate packaging.
+This page describes the current source checkout's supported scope, not a dated
+hardware-validation report or proof that published release assets match it.
 
 ## Installed files and licensing
 

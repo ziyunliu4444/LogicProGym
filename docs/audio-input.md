@@ -1,4 +1,4 @@
-# Let the agent hear Logic
+# Audio observations: capture, permissions, and an example agent
 
 Optional audio observations give the policy a rolling PCM waveform. On macOS
 14.2 or later, native capture can read Logic's application output directly.

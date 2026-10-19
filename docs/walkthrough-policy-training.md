@@ -76,7 +76,7 @@ Evaluation chooses the highest-scoring pitch instead of sampling. Resume checks
 configuration compatibility; do not edit the task configuration between these
 commands. For a different task, choose a new checkpoint path. A checkpoint does
 not restore your Logic project, knob positions, routing, or human performance.
-Save the Logic project separately. See [checkpoint details](checkpoints-and-release.md).
+Save the Logic project separately. See [checkpoint details](checkpoints.md).
 
 ## Troubleshoot
 

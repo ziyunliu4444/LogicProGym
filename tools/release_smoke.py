@@ -13,25 +13,42 @@ import gymnasium as gym
 import logicprogym
 
 
+def installed_templates(base):
+    """Check both packaged template locations and include future additions."""
+    canonical = base / 'configs/examples'
+    paths = sorted(canonical.glob('*.yaml'))
+    names = {path.name for path in paths}
+    required = {'logic_discovery.yaml', 'logic_frames.yaml'}
+    assert required <= names, f'Missing required templates: {required - names}'
+    legacy = base / 'configs'
+    legacy_names = {path.name for path in legacy.glob('*.yaml')}
+    assert names == legacy_names, 'Packaged template locations disagree'
+    for path in paths:
+        assert path.read_bytes() == (legacy / path.name).read_bytes(), path.name
+    return paths
+
+
 def main():
     base = Path(sys.prefix) / 'share/logicprogym'
-    templates = ('logic_midi_only.yaml', 'logic_mackie_only.yaml',
-                 'logic_human_agent.yaml', 'logic_two_agents.yaml',
-                 'logic_human_feedback.yaml', 'logic_audio_agent.yaml', 'logic_frames.yaml',
-                 'logic_cutoff_reset.yaml', 'logic_shared_track.yaml', 'logic_split_tracks.yaml')
-    for filename in templates:
-        path = base / 'configs' / filename
+    templates = installed_templates(base)
+    for path in templates:
+        filename = path.name
         env = gym.make(logicprogym.ENV_ID, config_path=path)
-        if filename == 'logic_frames.yaml':
-            assert env.action_space.contains(0)
-        else:
-            assert len(env.action_space.spaces) > 0
-        if filename == 'logic_audio_agent.yaml':
-            assert env.observation_space['audio'].shape == (4800, 2)
-        env.close()  # No reset: no hardware ports are opened.
+        try:
+            if isinstance(env.action_space, gym.spaces.Discrete):
+                assert env.action_space.n == 1 and env.action_space.contains(0)
+            else:
+                assert len(env.action_space.spaces) > 0
+            if filename == 'logic_audio_agent.yaml':
+                assert env.observation_space['audio'].shape == (4800, 2)
+        finally:
+            env.close()  # No reset: no hardware ports are opened.
         result = subprocess.run([sys.executable, '-m', 'logicprogym.cli', 'preview', str(path)],
                                 capture_output=True, text=True, timeout=10, check=True)
         assert 'Control preview' in result.stdout
+    for command in ('inspect', 'scan'):
+        subprocess.run([sys.executable, '-m', 'logicprogym.cli', 'logic', command, '--help'],
+                       capture_output=True, text=True, timeout=10, check=True)
     # Test every shipped runnable entrypoint, including tools and live checks.
     for folder in ('examples', 'tools', 'live_tests'):
         scripts = sorted((base / folder).glob('*.py'))

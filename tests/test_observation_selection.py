@@ -97,13 +97,13 @@ def test_reset_steps_history_info_reward_and_masks_are_selected():
         assert original.events[0].values['velocity'] == .8
         assert original.diagnostics['mackie']['mackie_displays']
         backend.snapshot = DawSnapshot(events=(event('hidden', note=90, velocity=.3),))
-        obs, _, _, _, info = env.step({})
+        obs, _, _, _, info = env.step(0)
         assert rewarded[-1] is info['snapshot']
         assert not rewarded[-1].events
         assert obs['event_mask'].sum() == 2  # Only selected history persists.
         assert not obs['active_notes'][2].any()
         backend.snapshot = DawSnapshot(events=(event(kind='note_off', note=60, velocity=.4),))
-        obs, *_ = env.step({})
+        obs, *_ = env.step(0)
         assert not obs['active_notes'].any()
         obs, info = env.reset()
         assert not obs['event_mask'].any()
@@ -140,19 +140,19 @@ def test_frame_selection_precedes_pending_and_skipped_note_state():
             event(note=60, velocity=.8, _received_monotonic=.02),
             event('hidden', note=80, velocity=.9, _received_monotonic=.07),
             event(kind='note_off', note=60, velocity=.3, _received_monotonic=.07)))
-        obs, _, _, _, info = env.step({})
+        obs, _, _, _, info = env.step(0)
         assert info['frame']['midi_events'] == 1
         assert obs['active_notes'][0, 60, 0] == 1
         assert obs['active_notes'][0, 60, 1] == 0
         assert len(clock.pending) == 1
         assert clock.pending[0].values['velocity'] == 0
         now[0] = .18  # The pending release falls in a skipped interval.
-        obs, _, _, _, info = env.step({})
+        obs, _, _, _, info = env.step(0)
         assert info['frame']['skipped_interval_events'] == 1
         assert not obs['active_notes'].any()
         assert not obs['event_mask'].any()
         backend.snapshot = DawSnapshot(events=(event(note=62, velocity=.9, _received_monotonic=1),))
-        env.step({})
+        env.step(0)
         assert clock.pending
         env.reset()
         assert not clock.pending
@@ -225,7 +225,7 @@ def test_hidden_events_do_not_consume_history_capacity_and_zero_velocity_release
         assert obs['events'][0, 4] == 60
         assert obs['active_notes'][0, 60, 0] == 1
         backend.snapshot = DawSnapshot(events=(event(note=60, velocity=0),))
-        obs, _, _, _, info = env.step({})
+        obs, _, _, _, info = env.step(0)
         assert info['snapshot'].events[0].kind == 'note_off'
         assert not obs['active_notes'].any()
     finally:

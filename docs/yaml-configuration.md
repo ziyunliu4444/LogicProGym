@@ -340,8 +340,16 @@ All are optional, under a single `environment` mapping:
 | `reset_controls` | Omitted: no configured control baseline restoration |
 
 Capacities size arrays, not actual Logic tracks or instruments. For an
-observation-only session, enable frames and omit all actions: the environment
+observation-only session, omit all actions: the environment
 exposes `Discrete(1)` and `step(0)` as a no-op. See [frame observations](frame-observations.md).
+
+Frames are optional. Without frames, steps return available observations without
+waiting for a frame boundary; pace your own loop. This applies to YAML, registered
+Gymnasium environments, and direct Python construction. Only action `0` is valid
+in an action-free session; use it instead of the previous empty dictionary.
+The snapshot reward callback receives an empty action mapping, while outer
+Gymnasium reward wrappers receive the public action `0`. Connecting or resetting
+can still initialize Mackie views; no-op does not mean side-effect-free setup.
 
 For native audio, `audio.source: native`, `bundle_id: auto`, `channels: 2`, and
 `window_frames: 4800` are typical. `sample_rate` may be omitted for automatic

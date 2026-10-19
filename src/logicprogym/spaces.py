@@ -8,13 +8,17 @@ from gymnasium import spaces
 from logicprogym.actions.specs import ActionRepresentation, ActionSpec
 
 
-def build_action_space(specs: Sequence[ActionSpec]) -> spaces.Dict:
+def build_action_space(specs: Sequence[ActionSpec]) -> spaces.Dict | spaces.Discrete:
     """Compile policy representations into one structured Gymnasium space.
 
     This function deliberately ignores DAW encoding. For example, a normalized
     continuous velocity remains a Box even when MIDI later encodes it as 0..127.
     """
 
+    # Empty Dict spaces are invalid in Gymnasium. All observation-only sessions
+    # expose the same explicit no-op, independently of timing or transport.
+    if not specs:
+        return spaces.Discrete(1)
     result: dict[str, spaces.Space] = {}
     for spec in specs:
         if spec.id in result:

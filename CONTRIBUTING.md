@@ -63,8 +63,8 @@ Use type annotations for new public APIs where practical.
 - Never send live MIDI from automated tests. Use injectable fake backends.
 - Keep human and agent routes separate. Do not reset unowned controls.
 - Missing or stale feedback is not zero and is not confirmed state.
-- Do not put forced process exit in the reusable environment. CLI supervision
-  has different responsibilities; see [shutdown](docs/shutdown.md).
+- Do not put forced process exit in the reusable environment. Examples call
+  the environment directly; see [shutdown and cleanup limits](docs/shutdown.md).
 - Preserve public action IDs, shapes, units, YAML meanings and checkpoint
   compatibility unless the PR explicitly proposes a migration.
 - Do not commit personal YAML, recordings, checkpoints, Logic projects or

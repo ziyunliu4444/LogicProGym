@@ -19,6 +19,12 @@ The template uses track 2 and controller 2. No keyboard or IAC note bus is neede
 Configure the matching LogicProGym To/From endpoints using the [setup guide](renaming.md).
 Virtual ports exist only while connected. Stop other agents/scanners first.
 
+This template is primarily for `inspect`, `scan`, and configuration checks.
+It has no control actions, so Gymnasium exposes `Discrete(1)`: `step(0)` obtains
+observations without sending control actions. After discovery, select catalog
+entries and add actions as shown below to control or observe particular knobs.
+For timed observation intervals, see the [frame example](frame-observations.md).
+
 The tools connect only Mackie endpoints: no notes, audio capture, or configured
 episode-reset commands. They do change selection and Instrument pages. Save your
 project first; selection, pages, and manually changed knobs are not restored on exit.

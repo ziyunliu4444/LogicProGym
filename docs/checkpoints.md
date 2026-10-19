@@ -1,4 +1,4 @@
-# Checkpoints and resume
+# Training checkpoints: save, resume, and evaluate
 
 The `logic_train_policy.py` command saves before calling the environment’s
 `close()`. LogicProGym handles note release and port cleanup, including Ctrl-C

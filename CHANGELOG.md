@@ -2,6 +2,16 @@
 
 ## 1.0.0
 
+- Unified action-free sessions around `Discrete(1)` and `step(0)`, with or
+  without frame timing, including direct Python and registered construction.
+  Replace empty-dictionary steps in older observation-only code with `step(0)`.
+- Added interactive Mackie inspection, all-page scanning, and selected parameter
+  catalog references in YAML, including a name-free discovery template.
+- Added the public `parameter_readings(info)` interface and shared-instrument
+  readouts for raw display text, age, and independently validated numeric values.
+- Release checks cover every shipped template, including no-action discovery
+  sessions, and the inspector/scanner CLI entry points.
+
 - Enforce per-track YAML observation selection on reset, steps, snapshots, and
   frame histories. Omitted `observe` now hides track state; add the required
   signal names explicitly. Unknown names are rejected. Raw cached LCD diagnostics
@@ -12,8 +22,8 @@
   public YAMLs, walkthroughs, and finite-run options.
 
 - Fixed negative frame sleep intervals and burst-packet audio overlaps.
-- Training saves before MIDI cleanup; CLI supervision bounds stuck shutdown
-  with an explicit warning and nonzero exit status.
+- Training saves before MIDI cleanup. Environment cleanup has a bounded wait
+  and reports timeouts; it cannot guarantee process exit after a native stall.
 - Packaged reset examples and a device-neutral CC20 cutoff template.
 - Documented configured baselines and stale controller-assignment troubleshooting.
 - Added setup and troubleshooting guides for frames, checkpoint resume, and

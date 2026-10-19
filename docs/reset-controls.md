@@ -1,4 +1,4 @@
-# Opt-in episode initialization
+# Reset behavior and configured MIDI-control baselines
 
 By default, reset does not restore presets or knob positions. To initialize
 selected controls on every reset, add this to your session YAML:

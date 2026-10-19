@@ -1,4 +1,4 @@
-# Maintainer release checks
+# Release verification: tests, packaging, and live checks
 
 This checklist is for packaging and release preparation. End users should start
 with the [setup guide](logic-setup.md) and [live validation](logic-1.0-acceptance.md).
@@ -11,14 +11,52 @@ python -m pytest -q
 python -m pip check
 ```
 
-Build a wheel and install it in an isolated environment. Run
-`tools/release_smoke.py` with that environment's interpreter from outside the
-source checkout. The smoke test checks packaged templates, CLI previews,
-example help commands and bundled native sources; it does not open devices.
+## Build and check an installed wheel
+
+Run from the repository root with the development virtual environment active:
+
+```bash
+python -m pip install build
+PROJECT_DIR="$PWD"
+VERIFY_DIR="$(mktemp -d /tmp/logicprogym-verify.XXXXXX)"
+python -m build --outdir "$VERIFY_DIR/dist" .
+python -m venv "$VERIFY_DIR/venv"
+"$VERIFY_DIR/venv/bin/python" -m pip install "$VERIFY_DIR"/dist/*.whl
+cd "$VERIFY_DIR"
+"$VERIFY_DIR/venv/bin/python" -m pip check
+"$VERIFY_DIR/venv/bin/python" -c 'import logicprogym; print(logicprogym.__file__)'
+"$VERIFY_DIR/venv/bin/python" "$PROJECT_DIR/tools/release_smoke.py"
+cd "$PROJECT_DIR"
+```
+
+The printed import path must point into the temporary environment, not `src/`
+in your checkout. A fresh output directory avoids selecting an older wheel.
+Installation requires access to dependency packages. Keep the temporary folder
+until you have reviewed the results; these commands do not publish a release.
+
+The smoke test discovers all installed YAML templates, checks that both packaged
+template locations agree, constructs their environments without reset, runs CLI
+previews and inspector/scanner help, and checks example/tool/live-test help and
+bundled native sources. Every template is constructed through `gym.make`.
+Action-free templates, including discovery and the frame observer, use
+`Discrete(1)` with `step(0)` for observation-only runs. No MIDI ports or audio
+devices are opened during this check.
+
+## Inspect the archives
 
 Check that release archives exclude virtual environments, IDE settings,
 personal session files, credentials, recordings and model outputs. Source
 archives must retain the fixtures needed by the test suite.
+For example, using the temporary build directory above:
+
+```bash
+python -m zipfile -l "$VERIFY_DIR"/dist/*.whl
+tar -tzf "$VERIFY_DIR"/dist/*.tar.gz
+```
+
+Record the commit, package version, automated results, and installed-wheel result
+for the release. Rebuild after changing files; a successful older wheel check
+does not validate a later source checkout.
 
 ## Live checks
 

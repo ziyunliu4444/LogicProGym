@@ -191,12 +191,15 @@ class LogicProEnv(gym.Env):
 
         if not self._connected:
             raise RuntimeError("Call reset before step; the environment is disconnected")
-        if self.frame_clock is not None and not self.action_specs and isinstance(self.action_space, gym.spaces.Discrete):
+        if not self.action_specs:
             if not self.action_space.contains(action):
-                raise ValueError('Observation-only frames require no-op action 0')
+                raise ValueError('Action-free sessions require no-op action 0')
+            # Snapshot rewards retain their mapping-based contract. Outer
+            # Gymnasium wrappers still receive the original public action 0.
             action = {}
         commands = self.action_processor.process(action)
-        self.backend.apply(commands)
+        if self.action_specs:
+            self.backend.apply(commands)
         frame = None if self.frame_clock is None else self.frame_clock.wait()
         snapshot = self._select_snapshot(self.backend.observe())
         if frame is not None:

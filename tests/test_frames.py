@@ -107,12 +107,12 @@ def test_frame_events_do_not_roll_over_but_notes_persist():
     future = DawEvent(0, 'agent', EventSource.HUMAN, 'note_off',
                       {'note': 60, 'velocity': 0, '_received_monotonic': .05})
     snapshots.append(DawSnapshot(events=(note, future)))
-    obs, _, _, _, info = env.step({})
+    obs, _, _, _, info = env.step(0)
     assert info['frame']['midi_events'] == 1
     assert obs['event_mask'].sum() == 1
-    obs, _, _, _, info = env.step({})
+    obs, _, _, _, info = env.step(0)
     assert info['frame']['midi_events'] == 1
-    obs, _, _, _, info = env.step({})
+    obs, _, _, _, info = env.step(0)
     assert obs['event_mask'].sum() == 0
     env.close()
 

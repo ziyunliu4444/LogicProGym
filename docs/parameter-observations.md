@@ -1,4 +1,4 @@
-# Mackie parameter observations
+# Mackie parameter feedback: display text, numeric values, and validity
 
 Mackie can report the values displayed by Logic. The environment
 exposes accepted numeric readings in `observation['parameter_values']` and

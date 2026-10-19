@@ -14,13 +14,13 @@ def test_timing_and_reset_boundary():
     inner = LogicProEnv(DummyAdapter(), [])
     env = StepTiming(inner, clock=lambda: next(ticks))
     env.reset()
-    info = env.step({})[-1]
+    info = env.step(0)[-1]
     assert info['timing']['step_duration_seconds'] == pytest.approx(.1)
     assert info['timing']['start_interval_seconds'] is None
-    info = env.step({})[-1]
+    info = env.step(0)[-1]
     assert info['timing']['start_interval_seconds'] == .5
     env.reset()
-    assert env.step({})[-1]['timing']['start_interval_seconds'] is None
+    assert env.step(0)[-1]['timing']['start_interval_seconds'] is None
     env.close()
 
 def test_timing_factory(tmp_path):
