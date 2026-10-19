@@ -1,6 +1,7 @@
 # LogicProGym
 
 [![Discord](https://img.shields.io/badge/Discord-Join%20the%20community-5865F2?logo=discord&logoColor=white)](https://discord.gg/DsTpCDrPyq)
+[![HAL: hal-05800122](https://img.shields.io/badge/HAL-hal--05800122-B03532)](https://hal.science/hal-05800122)
 
 A Gymnasium interface for learning agents that make music alongside humans in
 Logic Pro. Configure what each track can observe and control, then use standard
