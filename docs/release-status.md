@@ -1,7 +1,7 @@
 # Version 1.0.0: supported features and limitations
 
 **Version: 1.0.0.** Live behavior depends on your instruments, routing, and
-operating system. Use the [live checklist](logic-1.0-acceptance.md) to validate
+operating system. Use the [live checklist](live-testing.md) to validate
 the features you plan to use; software tests alone do not verify a Logic setup.
 
 ## Requirements
@@ -59,8 +59,7 @@ Articulation requires an instrument-specific mapping supplied by the researcher.
 - Native audio captures the selected application's mix, not isolated stems.
   Full Logic transport/state restoration is outside the release scope.
 
-Use the [live checklist](logic-1.0-acceptance.md) to validate your setup.
-Maintainers can use the [release checks](final-check.md) to validate packaging.
+Maintainers can use the [release checks](release-checklist.md) to validate packaging.
 This page describes the current source checkout's supported scope, not a dated
 hardware-validation report or proof that published release assets match it.
 

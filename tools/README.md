@@ -17,7 +17,7 @@ see the [YAML guide](../docs/yaml-configuration.md).
 | Find MIDI input/output names | `logicprogym devices` | [First connection](../README.md#discover-your-midi-devices) |
 | Preview controls without opening ports | `logicprogym preview SESSION.yaml` | [Control modes](../docs/control-modes.md) |
 | Check configuration and MIDI port names | `logicprogym doctor SESSION.yaml` | [Setup checks](../docs/logic-setup.md#4-check-the-configuration) |
-| Verify a Mackie mapping in Logic | `logicprogym doctor SESSION.yaml --live` | [Connection troubleshooting](../docs/renaming.md) |
+| Verify a Mackie mapping in Logic | `logicprogym doctor SESSION.yaml --live` | [Connection troubleshooting](../docs/connection-troubleshooting.md) |
 | Browse pages and manually test knobs | `logicprogym logic inspect SESSION.yaml --track ALIAS` | [Inspector commands](../docs/mackie-discovery.md#interactive-inspector) |
 | Discover names and page/slot addresses | `logicprogym logic scan SESSION.yaml --track ALIAS --all --output configs/my_instrument.yaml` | [Discovery and catalogs](../docs/mackie-discovery.md) |
 | Assign a MIDI CC to a plug-in knob | `python tools/logic_midi_learn.py --port "YOUR_AGENT_OUTPUT" --channel 1 --cc 20` | [Assignment walkthrough](../docs/control-modes.md#let-the-agent-control-a-logic-plug-in-knob-using-midi) |
@@ -47,5 +47,5 @@ For a new instrument with no known parameter names, start with
 ## Maintainers
 
 `release_smoke.py` checks installed package files without MIDI I/O. It is not a
-musical example or a live routing test. See [release packaging checks](../docs/final-check.md)
+musical example or a live routing test. See [release packaging checks](../docs/release-checklist.md)
 for the complete procedure.

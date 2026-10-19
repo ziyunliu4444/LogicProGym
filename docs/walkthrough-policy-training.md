@@ -11,7 +11,7 @@ Follow the [setup guide](logic-setup.md): Track 1 is your keyboard/piano;
 Track 2 is the agent instrument on a separate IAC input. For the supplied hybrid
 configuration, use Alchemy's **8-Bit Memories** and Mackie 2 on Track 2, with
 `Robotc` and `Cutoff` at page 1, slots 1 and 2. Match the controller's numbered
-To/From ports as described in [endpoint setup](renaming.md#mackie-endpoints).
+To/From ports as described in [endpoint setup](connection-troubleshooting.md#mackie-endpoints).
 No third track is needed. Save your project and lower monitoring volume.
 
 From an installed source checkout with the virtual environment active:

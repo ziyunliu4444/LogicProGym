@@ -16,7 +16,7 @@ cp configs/examples/logic_discovery.yaml configs/my_discovery.yaml
 
 Set `track` and `controller` to your one-based Logic track and Mackie numbers.
 The template uses track 2 and controller 2. No keyboard or IAC note bus is needed.
-Configure the matching LogicProGym To/From endpoints using the [setup guide](renaming.md).
+Configure the matching LogicProGym To/From endpoints using the [setup guide](connection-troubleshooting.md).
 Virtual ports exist only while connected. Stop other agents/scanners first.
 
 This template is primarily for `inspect`, `scan`, and configuration checks.
@@ -138,7 +138,7 @@ percentages for parameter names or guess an unavailable page identity.
   parameter names. Read the error for a missing header or page count. The scanner
   makes one Name/Value attempt; it stops if the requested header does not arrive.
 - **Stale or wrong-track feedback:** stop other bridge programs and follow the
-  [reconnection guide](renaming.md). Do not delete unrelated controller assignments.
+  [reconnection guide](connection-troubleshooting.md). Do not delete unrelated controller assignments.
 - **A knob test is refused:** `vpot` requires a recognized track/page even when
   values are visible. Use `left`/`right` and `lcd` to inspect the resulting page;
   do not assume a cached number belongs to the requested track.

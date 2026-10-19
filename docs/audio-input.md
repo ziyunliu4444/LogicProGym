@@ -241,4 +241,4 @@ No audio recording or learned checkpoint is saved.
 
 Native capture requires permission and a compatible audio setup. Validate
 reception, sample rate, shutdown and reopening on your machine before using
-observations for training. See the [live checklist](logic-1.0-acceptance.md).
+observations for training. See the [live checklist](live-testing.md).

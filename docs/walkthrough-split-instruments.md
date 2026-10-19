@@ -21,7 +21,7 @@ copy of your project and start at low monitoring volume.
    remain playable without relying on whichever track is currently selected.
 4. Pair Mackie Control 2 with Input `LogicProGym Control 2 To Logic` and Output
    `LogicProGym Control 2 From Logic`. The YAML creates two numbered pairs but
-   controls parameters only through controller 2. See [endpoint setup](renaming.md#mackie-endpoints).
+   controls parameters only through controller 2. See [endpoint setup](connection-troubleshooting.md#mackie-endpoints).
    Ports exist only while connected: for first-time pairing, start the example,
    assign the ports, then stop and rerun if initialization timed out. Run only
    one Mackie bridge process at a time.

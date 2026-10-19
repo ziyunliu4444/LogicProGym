@@ -34,5 +34,5 @@ python live_tests/logic_cutoff_reset_test.py configs/my_cutoff_reset.yaml
 
 A printed request does
 not confirm that Logic applied it. Inspect the actual instrument, note release
-and human-track behavior. See the [live checklist](../docs/logic-1.0-acceptance.md) and
+and human-track behavior. See the [live checklist](../docs/live-testing.md) and
 [reset guide](../docs/reset-controls.md). Device-free regression tests remain in `tests/`.

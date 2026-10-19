@@ -8,7 +8,7 @@ expected behavior, stopping, and troubleshooting. No private files are needed.
 | --- | --- | --- | --- | --- |
 | Play notes while an agent changes your instrument | Scripted | [Shared instrument](../docs/walkthrough-shared-instrument.md) | `logic_shared_track.py` | `logic_shared_track.yaml` |
 | Play alongside a synth agent | Scripted | [Separate instruments](../docs/walkthrough-split-instruments.md) | `logic_split_tracks.py` | `logic_split_tracks.yaml` |
-| Play alongside two differently controlled instruments | Scripted | [Multi-agent](../docs/two-agents-and-training.md) | `logic_multi_agent.py` | `logic_two_agents.yaml` |
+| Play alongside two differently controlled instruments | Scripted | [Multi-agent](../docs/walkthrough-multi-agent.md) | `logic_multi_agent.py` | `logic_two_agents.yaml` |
 | Train a policy to imitate your pitch | Learning | [Pitch-policy training](../docs/walkthrough-policy-training.md) | `logic_train_policy.py` | `logic_human_agent.yaml` |
 | Rate phrases through observed keyboard events | Learning | [Human feedback](../docs/human-midi-feedback.md) | `logic_human_feedback.py` | `logic_human_feedback.yaml` |
 | Let audio energy drive a knob | Scripted, audio-conditioned | [Audio agent](../docs/audio-input.md#example-an-agent-acts-on-raw-audio) | `logic_audio_agent.py` | `logic_audio_agent.yaml` |

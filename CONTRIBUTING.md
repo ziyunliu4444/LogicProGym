@@ -79,7 +79,7 @@ include track/page/slot and feedback diagnostics. For audio, include rate and
 validity/gap diagnostics. Do not post private recordings or device names unless
 you intend to share them.
 
-Use the [live checklist](docs/logic-1.0-acceptance.md) for relevant changes. Work
+Use the [live checklist](docs/live-testing.md) for relevant changes. Work
 in a backed-up test project at a comfortable volume. A fake-backend test is not
 evidence that a particular Logic instrument responded correctly.
 
@@ -87,7 +87,7 @@ evidence that a particular Logic instrument responded correctly.
 
 When adding public scripts or templates, review the packaged folder lists in
 `pyproject.toml`, `MANIFEST.in` and `tools/release_smoke.py` as applicable. Follow
-[release checks](docs/final-check.md) to verify installed files outside the source
+[release checks](docs/release-checklist.md) to verify installed files outside the source
 checkout. Do not publish packages or change the release version as part of an
 unrelated PR.
 

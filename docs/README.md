@@ -13,12 +13,12 @@ active virtual environment. Personal `configs/my_*.yaml` files are not bundled.
 | Run a musical demonstration or learning policy | [Example catalogue and walkthroughs](../examples/README.md) |
 | Define your own tracks, actions, and observations | [YAML tutorial and reference](yaml-configuration.md) |
 | Read MIDI, parameter, and audio observations in your policy | [Observation guide](observations.md) |
-| Verify audio, reset, routing, or shutdown on your machine | [Live checks](../live_tests/README.md) |
+| Verify audio, reset, routing, or shutdown on your machine | [Live testing checklist](live-testing.md) and [test commands](../live_tests/README.md) |
 
 ## Troubleshooting
 
 - Wrong or missing Mackie display: [discovery troubleshooting](mackie-discovery.md#understand-the-display-and-troubleshoot).
-- Stale endpoints or wrong routing: [reconnect control surfaces](renaming.md).
+- Stale endpoints or wrong routing: [reconnect control surfaces](connection-troubleshooting.md).
 - MIDI-mapped knob does not move: [assignment guide](control-modes.md#let-the-agent-control-a-logic-plug-in-knob-using-midi).
 - Missing audio or recording permission: [audio guide](audio-input.md).
 - Notes or processes remain after stopping: [shutdown and cleanup](shutdown.md).
@@ -32,11 +32,18 @@ active virtual environment. Personal `configs/my_*.yaml` files are not bundled.
 - [Opt-in control resets](reset-controls.md)
 - [Timing, freshness, and run manifests](experiment-reproducibility.md)
 - [Checkpoints and resume](checkpoints.md)
-- [Full live acceptance checklist](logic-1.0-acceptance.md)
 
 ## Contributors and maintainers
 
 - [Contribution guide](../CONTRIBUTING.md)
 - [Architecture and extension points](architecture.md)
 - [Draft plug-in bridge protocol (extension design)](../protocol/spec-v1.md)
-- [Release packaging checks](final-check.md)
+- [Release packaging checks](release-checklist.md)
+
+## How the guides fit together
+
+- **Setup tools** explain how to connect, discover parameters, and map controls.
+- **Walkthroughs** demonstrate musical tasks with runnable examples.
+- **Reference guides** define configuration, observations, reset, and checkpoint behavior.
+- **Live testing** checks your Logic session; `live_tests/` lists the runnable checks.
+- **The release checklist** is for maintainers building and verifying distributions.

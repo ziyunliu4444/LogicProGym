@@ -150,7 +150,7 @@ Logic project on reset. Optional [agent-owned MIDI control resets](docs/reset-co
 can initialize selected CC and pitch-bend values at the start of each episode.
 
 See [support scope](docs/release-status.md) and use the
-[live setup checklist](docs/logic-1.0-acceptance.md) to validate your instruments
+[live setup checklist](docs/live-testing.md) to validate your instruments
 and routing before an experiment.
 
 ## Documentation and development
@@ -158,7 +158,7 @@ and routing before an experiment.
 See the [documentation index](docs/README.md) for setup, examples and experiment
 design. Generated Mackie ports start with `LogicProGym Control`; they are
 application-created endpoints, not keyboard names. If Logic has stale endpoint
-state, follow the [reconnection guide](docs/renaming.md).
+state, follow the [reconnection guide](docs/connection-troubleshooting.md).
 
 ## Citation
 

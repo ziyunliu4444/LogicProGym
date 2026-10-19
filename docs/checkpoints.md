@@ -22,19 +22,12 @@ YAML can contain local port names and paths; review it before sharing weights.
 
 ## Validate a saved experiment
 
-Use a saved test project and quiet monitoring levels. Stop other bridge scripts.
-Record the exact Logic and macOS versions with the following live results:
+Follow the [pitch-policy walkthrough](walkthrough-policy-training.md#stop-save-resume-and-evaluate)
+for save, resume, and evaluation commands, or the
+[human-feedback walkthrough](human-midi-feedback.md) for phrase preferences.
+Confirm that resuming retains training progress and that evaluation does not
+overwrite the checkpoint. Keep the session configuration unchanged.
 
-- Run live doctor for the mixed example and confirm the synth parameter names.
-- Run the mixed example long enough to play the human track; verify synth notes
-  and knobs, trombone notes and bend, and no unintended human-track control.
-- Test both finite completion and Ctrl-C, checking for stuck notes afterwards.
-- Repeat opening, stepping, and closing in one Python process. Automated tests
-  cover this lifecycle with a fake adapter, not native MIDI hardware.
-- Save and resume the pitch-training policy; confirm training progress is retained.
-
-For initial setup validation, use **one active Mackie controller** with
-configured MIDI tracks. Independent multiple-Mackie operation remains
-experimental. Cached LCD text is diagnostic only; it is not a confirmed fresh
-parameter value and must not be used as a reward measurement. The included
-pitch reward does not depend on cached Mackie values.
+For routing, note release, and reopening checks, use the
+[live testing checklist](live-testing.md). Checkpoint persistence does not
+establish that the instrument received its controls or returned to its saved state.

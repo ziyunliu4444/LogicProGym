@@ -78,7 +78,7 @@ reset. `display_received_at` is the local monotonic receipt time;
 validity. The shared-track example prints this raw text and age
 directly from the `info` returned by `env.step()`.
 
-Configure a mixed session using the [multi-track guide](two-agents-and-training.md).
+Configure a mixed session using the [multi-track guide](walkthrough-multi-agent.md).
 With the corresponding Mackie endpoints assigned, run:
 
 ```bash

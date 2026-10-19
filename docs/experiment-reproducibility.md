@@ -72,6 +72,6 @@ contain device names and private paths. No audio is recorded by this feature.
 ## Release acceptance
 
 Automated checks do not establish live hardware correctness. From the clean
-repository, repeat the checklist in [live acceptance](logic-1.0-acceptance.md).
+repository, repeat the checklist in [live acceptance](live-testing.md).
 Passing on one setup does not certify other instruments or routes. Full Logic project
 restoration and deterministic playback remain out of scope.

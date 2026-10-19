@@ -18,7 +18,7 @@ Save a copy of your Logic project and lower monitoring volume before starting.
    Input `LogicProGym Control 1 To Logic` with Output
    `LogicProGym Control 1 From Logic`. The configuration creates two numbered
    controller pairs, but this example sends parameter actions only to controller 1.
-   See [endpoint setup](renaming.md#mackie-endpoints): virtual ports appear only
+   See [endpoint setup](connection-troubleshooting.md#mackie-endpoints): virtual ports appear only
    while connected. On first setup, start the example to expose the ports, pair
    them, then stop and rerun if connection initialization timed out. Do not run
    another Mackie agent or scanner at the same time.
